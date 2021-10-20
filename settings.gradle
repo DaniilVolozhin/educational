@@ -1,0 +1,6 @@
+rootProject.name = 'educational'
+
+include 'tddByExampleWithJUnit5', 'sweater'
+include 'all-library.datajpa','all-library.library','all-library.library-orm'
+include 'taco.taco-cloud', 'taco.taco-cloud-all.taco-cloudREST'
+include 'ServerTOMCat', 'PortfolioProgect'

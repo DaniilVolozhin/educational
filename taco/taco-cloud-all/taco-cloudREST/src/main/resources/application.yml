@@ -1,0 +1,127 @@
+spring:
+#  thymeleaf:
+#    cache: false
+
+  data:
+    rest:
+      base-path: /api
+
+  datasource:
+      url: jdbc:h2:mem:testdb
+      driverClassName: org.h2.Driver
+      username: sa
+      password:
+
+# Конфигурация для ActiveMQ(сообщения)
+  artemis:
+    host: artemis.tacocloud.com
+#    url который прослушивает броке (ActiveMQ)
+    port: 61617
+#    порт который прослушивает брокер(ActiveMQ)
+    user: test
+    password: test
+  jms:
+    template:
+      default-destination: tacocloud.order.queue
+#      указали имя получателя по умолчанию
+
+#
+#server:
+##  поменять у сервера порт с по умолчанию 8080 на 9090
+#  port : 9090
+#
+
+
+#
+## БАЗА ДАННЫХ
+## Если нужно использовать например MYSQL
+#
+#spring:
+#  datasource:
+##    url по которому доступна база
+#    url: jdbc:mysql://localhost/tacocloud
+#    username: tacodb
+#    password: tacopassword
+##    можно и не указывать драйвер, его подтянут автоматически из структуры url, если он уже скачан
+#    driver-class-name: com.mysql.jbdc.Driver
+#
+
+
+#
+##   ДЛЯ shema.sql и data.sql      явная конфигурация
+#    schema:
+#      -order-schema.sql
+#      -ingredient-schema.sql
+#      -taco-schema.sql
+#      -user-schema.sql
+#    data:
+#      -ingredients.sql
+#
+
+
+#
+##   то же самое но через JNDI     является самым приоитетным, другие игнорируются
+#    jndi-name: /comp/env/jdbc/tacoCloudDS
+#
+
+#
+#    ДЛЯ HTTPS
+#server:
+#  port: 8443
+#  ssl:
+##    указание на путь к файлу сгенерированному в keytool
+#    key-store: file:///path/to/mykeys.jks
+##    пароль
+#    key-store-password: letmein
+##    пароль
+#    key-password: letmein
+
+#
+##    КОНФИГУРАЦИЯ ЛОГГИРОВАНИЯ
+#logging:
+##  указывает путь куда писать логи
+#  path: /var/logs/
+##  указывает файл в который писать логи
+#  file: TacoCloud.log
+##  указывает уровень логирвоания для spring security
+#  level:
+#    root: WARN
+#    org:
+#      springframework:
+#        security: DEBUG
+
+
+# ИСПОЛЬЗОВАНИЕ СПЕЦИАЛЬНЫХ ЗНАЧЕНИЙ СВОЙСТВ
+
+greeting:
+#  пример того как можно использовать занчение из другого свойства
+  welcome: You are using ${spring.application.name}
+
+
+# ПАРАМЕТРЫ КОНФИГУРАЦИИ ДЛЯ ConfigurationProperties
+# ЗАВИСЯТ ОТ ТОГО КАКОЙ ВЫ УКАЗАЛИ prefix и как назвали переменную
+taco:
+  orders:
+    pageSize: 10
+
+
+#    АКТИВАЦИЯ ПРОФИЛЯ
+#  profiles:
+#    active:
+#      также можно указать несколько активных профилей
+#      можно указать профиль в переменную окружения % export SPRING_PROFILES_ACTIVE=
+#      -prod
+
+
+# Указывается дополнительная конфигурация для профиля
+
+#---
+#spring:
+#  profiles: prod
+#    datasource:
+#      url: jdbc:mysql://localhost/tacocloud
+#      username: tacouser
+#      password: tacopassword
+#    logging:
+#      level:
+#        tacos: WARN
