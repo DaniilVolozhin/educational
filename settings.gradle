@@ -1,6 +1,7 @@
 rootProject.name = 'educational'
 
 include 'tddByExampleWithJUnit5', 'sweater'
-include 'all-library.datajpa','all-library.library','all-library.library-orm'
-include 'taco', 'taco.taco-cloud'//, 'taco.taco-cloutaco-cloudREST'
-include 'ServerTOMCat', 'PortfolioProgect'
+include 'all-library:datajpa','all-library:library','all-library:library-orm'
+include 'taco', 'taco:taco-cloud', 'taco:taco-cloud-all:taco-cloudREST'
+include 'tomcat-servlet:ServerTOMCat', 'tomcat-servlet:project-with-auth'
+include 'GenerateSchemaInBase'

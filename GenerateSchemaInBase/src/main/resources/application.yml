@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: ddl
+
+  profiles:
+    active: local
+
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: postgres
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+
+---
+
+spring:
+  profiles: local
+  datasource:
+    password: password
+    url: jdbc:postgresql://localhost:5432/local
+    username: postgres
+---
+
+spring:
+  profiles: some
+  datasource:
+    password: password
+    url: jdbc:postgresql://postgres:5432/postgres
+    username: postgres
