@@ -14,7 +14,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 
 
-public class Testt {
+public class PromisedPaymentTest {
 
 //    @BeforeEach
 //    public void setupValidatorInstance() {
