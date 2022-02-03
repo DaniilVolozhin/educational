@@ -14,6 +14,8 @@ import java.util.List;
 @Accessors(chain = true)
 public class PromisedPayment {
 
+    @NotNull
+    private PromisedPaymentAvailability promisedPaymentAvailability;
     private long msisdn;
     @NotNull
     private BigDecimal minRange;
@@ -70,6 +72,13 @@ public class PromisedPayment {
             @NotNull(groups = CustomizedPromisedPaymentInfoGroup.class)
             private BigDecimal chargeAmount;
         }
+    }
+
+    public enum PromisedPaymentAvailability {
+        CONDITIONALLY_AVAILABLE,
+        AVAILABLE,
+        UNAVAILABLE,
+        AVAILABLE_DUPLICATE
     }
 
     public interface CustomizedPromisedPaymentInfoGroup extends Default {}

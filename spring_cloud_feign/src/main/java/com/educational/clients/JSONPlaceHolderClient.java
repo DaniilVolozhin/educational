@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 
-@FeignClient(value = "jplaceholder", url = "https://jsonplaceholder.typecode.com/")
+@FeignClient(value = "jplaceholder", url = "https://jsonplaceholder.typicode.com/")
 @Component
 public interface JSONPlaceHolderClient {
 

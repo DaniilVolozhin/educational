@@ -40,8 +40,8 @@ public class PromisedPaymentTest {
     private PromisedPayment buildRegistrationFormWithBasicInfo() {
         PromisedPayment promisedPayment = new PromisedPayment();
         var promPrior = new PromisedPayment.PromisedPaymentPriority()
-//                .setItems(of(new PromisedPayment.PromisedPaymentPriority.Item()
-//                        .setChargeAmountPriority(BigDecimal.TEN).setAmountPriority(BigDecimal.ONE)))
+                .setItems(of(new PromisedPayment.PromisedPaymentPriority.Item()
+                        .setChargeAmountPriority(BigDecimal.TEN).setAmountPriority(BigDecimal.ONE)))
                 .setDuration(BigDecimal.TEN);
         promisedPayment.setPromisedPaymentPriority(promPrior);
         var cus = new PromisedPayment.CustomizedPromisedPaymentInfo()
@@ -52,7 +52,7 @@ public class PromisedPaymentTest {
                 .setMinAmount(BigDecimal.TEN);
         promisedPayment.setCustomizedPromisedPaymentInfo(
                 of(cus));
-//        promisedPayment.setChargeMethodId("");
+        promisedPayment.setChargeMethodId("");
         promisedPayment.setMaxDuration(BigDecimal.ONE);
         promisedPayment.setMinDuration(BigDecimal.ONE);
         promisedPayment.setMaxRange(BigDecimal.ONE);
