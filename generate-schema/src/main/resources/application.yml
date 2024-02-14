@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: generate
+
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+    show-sql: false
