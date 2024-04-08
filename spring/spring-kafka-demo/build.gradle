@@ -12,26 +12,26 @@ repositories {
 	mavenCentral()
 }
 
-ext {
-	set('springBootAdminVersion', "3.0.0-M4")
-}
+//ext {
+//	set('springBootAdminVersion', "3.0.0-M4")
+//}
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'de.codecentric:spring-boot-admin-starter-client'
-	implementation 'de.codecentric:spring-boot-admin-starter-server'
+//	implementation 'de.codecentric:spring-boot-admin-starter-client'
+//	implementation 'de.codecentric:spring-boot-admin-starter-server'
 	implementation 'org.springframework.kafka:spring-kafka'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
 }
 
-dependencyManagement {
-	imports {
-		mavenBom "de.codecentric:spring-boot-admin-dependencies:${springBootAdminVersion}"
-	}
-}
+//dependencyManagement {
+//	imports {
+//		mavenBom "de.codecentric:spring-boot-admin-dependencies:${springBootAdminVersion}"
+//	}
+//}
 
-tasks.named('test') {
+test {
 	useJUnitPlatform()
 }
