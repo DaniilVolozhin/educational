@@ -6,5 +6,8 @@ include 'taco', 'taco:taco-cloud', 'taco:taco-cloud-all:taco-cloudREST'
 include 'tomcat-servlet:ServerTOMCat', 'tomcat-servlet:project-with-auth'
 include 'generate-schema'
 include 'Spring_потрошитель'
-include 'spring', 'spring:spring_cloud_feign', 'spring:spring-kafka-demo'
+include 'spring',
+        'spring:spring_cloud_feign',
+        'spring:spring-kafka-demo',
+        'spring:spring-kafka'
 include 'spring:spring-integration'
