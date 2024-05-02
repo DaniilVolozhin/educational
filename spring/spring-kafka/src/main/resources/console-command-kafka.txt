@@ -1,0 +1,42 @@
+Kafka:
+1. .\kafka-storage.bat random-uuid
+	тут получаем id
+2.  .\kafka-storage.bat format -t id -c ..\..\config\kraft\server.properties
+	форматируем лог для совместимости с kraft
+3. .\kafka-server-start.bat ..\..\config\kraft\server.properties
+	запуск kafka с дефолтным конфигом
+4. .\kafka-server-stop.bat
+	остановаить все сервера кафки
+
+создание топика kafka:
+1. .\kafka-topics.bat --create --topic payment-created-events-topic --partitions 3 --replication-factor 3 --bootstrap-server localhost:9092,localhost:9094
+2. .\kafka-topics.bat --list --bootstrap-server localhost:9092,localhost:9094
+	посмотреть список топиков
+3. .\kafka-topics.bat --describe --bootstrap-server localhost:9092,localhost:9094
+	посмотреть список топиков с конфигурацией
+4. .\kafka-topics.bat --delete --topic payment-created-events-topic --bootstrap-server localhost:9092
+	удаляет топик, настройка delete.topic.enable=true(по умолчанию)
+
+работа с топиками:
+запись:
+1. .\kafka-console-producer.bat --bootstrap-server localhost:9092,localhost:9094 --topic payment-canceled-events-topic
+	отправляет сообщение в указанный топик, если топика нет и auto.create.topics.enable=true создастся автоматически
+2. .\kafka-console-producer.bat --bootstrap-server localhost:9092,localhost:9094 --topic payment-canceled-events-topic --property "parse.key=true" --property "key.separator=:"
+	отправляет сообщение в указанный топик с ключом
+		одинаковый key у сообщения попадет в одину портицию, и будет прочитаны в порядке добавления
+		в рамках key, разные key и null читаются в разнобой
+
+чтение:
+3. .\kafka-console-consumer.bat --bootstrap-server localhost:9092,localhost:9094 --topic payment-canceled-events-topic --from-beginning
+	читает все сообщения с начала из указанного топика
+4.  .\kafka-console-consumer.bat --bootstrap-server localhost:9092,localhost:9094 --topic payment-canceled-events-topic --from-beginning --property "print.key=true"
+	читает все сообщения с начала из указанного топика с ключом
+5.  .\kafka-console-consumer.bat --bootstrap-server localhost:9092,localhost:9094 --topic payment-canceled-events-topic --from-beginning --property "print.key=true" --property "print.value=false"
+	читает все сообщения с начала  из указанного топика с ключом без значения
+6.  .\kafka-console-consumer.bat --bootstrap-server localhost:9092,localhost:9094 --topic payment-canceled-events-topic --property "print.key=true"
+	читает новые сообщения из указанного топика с ключом
+
+.\kafka-server-start.bat ..\..\config\kraft\server1.properties
+.\kafka-server-start.bat ..\..\config\kraft\server2.properties
+.\kafka-server-start.bat ..\..\config\kraft\server3.properties
+.\kafka-console-consumer.bat --bootstrap-server localhost:9092,localhost:9094 --topic product-created-events-topic --property "print.key=true"
