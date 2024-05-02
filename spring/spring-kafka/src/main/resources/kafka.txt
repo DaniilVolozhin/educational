@@ -36,7 +36,46 @@ Kafka:
 6.  .\kafka-console-consumer.bat --bootstrap-server localhost:9092,localhost:9094 --topic payment-canceled-events-topic --property "print.key=true"
 	читает новые сообщения из указанного топика с ключом
 
+Конфиги кафка:
+spring config:
+spring.kafka.producer.acks=1
+  параметр отвечает за то сколько подтверждений получения сообщения должен получить producer от kafka broker
+  значение по умолчанию 1, означает что ждет подтверждение получения только от лидера
+  all означает что ждет подтверждение от всех брокеров синхронизированных с лидером на момент получения(учитывать min.insync.replicas)
+  0 не получать подтверждение
+  2 получать подтверждение от лидера и еще одной реплики
+
+spring.kafka.producer.retries=10
+  указывается максимальное количесто переотправок которые сделает producer до подтверждения получения сообщения
+spring.kafka.producer.properties.retry.backoff.ms=100
+  указывает с каким интервалом повторять переотправку сообщения до подтверждения получения сообщения
+    default 100 ms, 10 раз за секунду
+spring.kafka.producer.properties.delivery.timeout.ms=60000
+  указывается максимальное время на переотправку сообщения, после чего TimeoutException
+  default 120000 ms, 2 min
+  delivery.timeout.ms >= linger.ms + request.timeout.ms
+spring.kakfa.producer.properties.linger.ms=0
+  указывается время в течении которого producer накапливает сообщения перед отправкой их пачкой
+  default 0 ms, все сообщения отправлятся по 1 штуке
+  используется для повышения производительности
+spring.kafka.producer.properties.request.timeout.ms=30000
+  указывается время которые producer ждет подтверждение получения сообщения от kafka broker
+  при превышение будет TimeoutException
+
+
+kafka config:
+min.insync.replicas=0
+  минимальное количество реплик которые всегда должны быть в синхроне с лидером
+  указывается для топика
+  реплик топика может быть 3, а min.insync.replicas=2, 1 лидер, 2 реплики, одна из реплик в моменте обязательно должны быть сихронизированан с лидером для указаного топика
+    другая же может быть не синхронизирована в моменте, но сихнронизирована в будущем
+
+2 типа ошибок:
+1. retryable error - временная проблема, может быть решена переотправкой сообщения, причиной может быть упавшая реплика
+2. non-retyable - постоянная ошибка, переотправка не поможет. Например, превышен размер сообщения.
+
 .\kafka-server-start.bat ..\..\config\kraft\server1.properties
 .\kafka-server-start.bat ..\..\config\kraft\server2.properties
 .\kafka-server-start.bat ..\..\config\kraft\server3.properties
 .\kafka-console-consumer.bat --bootstrap-server localhost:9092,localhost:9094 --topic product-created-events-topic --property "print.key=true"
+
