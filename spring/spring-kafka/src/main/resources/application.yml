@@ -1,6 +1,7 @@
 server:
-  port: 0
-
+#  random port
+#  port: 0
+  port: 8990
 spring:
   kafka:
     producer:
@@ -8,8 +9,18 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       acks: all
-      retries: 10
       properties:
-        retry:
-          backoff:
-            ms: 1000
+        delivery:
+          timeout:
+            ms: 10000
+        linger:
+          ms: 5000
+        request:
+          timeout:
+            ms: 5000
+#      не рекомендуется настраивать через retry и backoff
+#      retries: 10
+#      properties:
+#        retry:
+#          backoff:
+#            ms: 1000

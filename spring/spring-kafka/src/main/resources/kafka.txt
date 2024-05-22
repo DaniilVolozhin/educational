@@ -17,6 +17,10 @@ Kafka:
 4. .\kafka-topics.bat --delete --topic payment-created-events-topic --bootstrap-server localhost:9092
 	удаляет топик, настройка delete.topic.enable=true(по умолчанию)
 
+Обновление топика:
+1. .\kafka-configs.bat --bootstrap-server localhost:9092 --alter --entity-type topics --entity-name product-created-events-topic --add-config min.insync.replicas=1
+  изменить кол-во серверов которые должны быть в реплике с лидером при подтверждении
+
 работа с топиками:
 запись:
 1. .\kafka-console-producer.bat --bootstrap-server localhost:9092,localhost:9094 --topic payment-canceled-events-topic
@@ -48,10 +52,12 @@ spring.kafka.producer.acks=1
 
 spring.kafka.producer.retries=10
   указывается максимальное количесто переотправок которые сделает producer до подтверждения получения сообщения
+  не рекомендуется к использованию, рекомендуется настраивать через timeout
 
 spring.kafka.producer.properties.retry.backoff.ms=100
   указывает с каким интервалом повторять переотправку сообщения до подтверждения получения сообщения
     default 100 ms, 10 раз за секунду
+    не рекомендуется к использованию, рекомендуется настраивать через timeout
 
 spring.kafka.producer.properties.delivery.timeout.ms=60000
   указывается максимальное время на переотправку сообщения, после чего TimeoutException
