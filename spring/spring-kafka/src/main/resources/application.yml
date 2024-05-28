@@ -24,3 +24,7 @@ spring:
 #        retry:
 #          backoff:
 #            ms: 1000
+        enable:
+          idempotence: true
+        max.in.flight:
+          requests.per.connection: 5

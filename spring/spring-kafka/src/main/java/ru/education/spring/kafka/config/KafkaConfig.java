@@ -29,6 +29,10 @@ public class KafkaConfig {
   private String linger;
   @Value("${spring.kafka.producer.properties.request.timeout.ms}")
   private String requestTimeout;
+  @Value("${spring.kafka.producer.properties.enable.idempotence}")
+  private String idempotence;
+  @Value("${spring.kafka.producer.properties.max.in.flight.requests.per.connection}")
+  private String maxInFlightRequest;
 
   public final String topicName = "product-created-events-topic";
 
@@ -65,7 +69,9 @@ public class KafkaConfig {
         ProducerConfig.ACKS_CONFIG, acks,
         ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, deliveryTimout,
         ProducerConfig.LINGER_MS_CONFIG, linger,
-        ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, requestTimeout
+        ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, requestTimeout,
+        ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, idempotence,
+        ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, maxInFlightRequest
     );
   }
 

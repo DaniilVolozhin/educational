@@ -73,6 +73,19 @@ spring.kafka.producer.properties.request.timeout.ms=30000
   указывается время которые producer ждет подтверждение получения сообщения от kafka broker
   при превышение будет TimeoutException
 
+spring.kafka.producer.properties.enable.idempotence=true
+  default true
+  включает идемпотентность для кафка брокера
+  рекомендуется всегда указывать это свойство явно
+  если поставить producer.acks=all idempotence останется true,
+    если producer.acks=5 idempotence не явно переведен в false,
+    если producer.acks=5 и задать свойство idempotence=true, то получим configuration exception
+  работать будет как обычно, если producer.acks=all, producer.retries > 0,
+    producer.properties.max.in.flight.requests.per.connection <= 5
+
+spring.kafka.producer.properties.max.in.flight.requests.per.connection=5
+  сколько запросов может быть отправлено и по которым еще не пришел acks от kafka,
+
 
 kafka config:
 min.insync.replicas=0
@@ -81,9 +94,14 @@ min.insync.replicas=0
   реплик топика может быть 3, а min.insync.replicas=2, 1 лидер, 2 реплики, одна из реплик в моменте обязательно должны быть сихронизированан с лидером для указаного топика
     другая же может быть не синхронизирована в моменте, но сихнронизирована в будущем
 
+java config:
+config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
+
 2 типа ошибок:
 1. retryable error - временная проблема, может быть решена переотправкой сообщения, причиной может быть упавшая реплика
 2. non-retyable - постоянная ошибка, переотправка не поможет. Например, превышен размер сообщения.
+
+
 
 .\kafka-server-start.bat ..\..\config\kraft\server1.properties
 .\kafka-server-start.bat ..\..\config\kraft\server2.properties

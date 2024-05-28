@@ -29,7 +29,7 @@ public class ProductController {
     String productId = null;
     try {
       productId = productService.createProduct(createProductDTO);
-    } catch (ExecutionException | InterruptedException e) {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
       return ResponseEntity
           .status(HttpStatus.INTERNAL_SERVER_ERROR)
