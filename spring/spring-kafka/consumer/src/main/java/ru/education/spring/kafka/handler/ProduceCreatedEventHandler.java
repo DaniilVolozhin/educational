@@ -9,11 +9,11 @@ import ru.education.spring.kafka.event.ProductCreatedEvent;
 
 @Slf4j
 @Component
-@KafkaListener(topics = "product-created-events-topic", properties = {"spring.json.value.default.type=ru.education.spring.kafka.event.ProductCreatedEvent"})
+@KafkaListener(topics = "product-created-events-topic")
 public class ProduceCreatedEventHandler {
 
   @KafkaHandler
-  public void handle(@Payload ProductCreatedEvent productCreatedEvent) {
+  public void handle(ProductCreatedEvent productCreatedEvent) {
     log.info("Received event: {}", productCreatedEvent.getTitle());
   }
 

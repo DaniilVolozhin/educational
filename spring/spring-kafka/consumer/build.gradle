@@ -27,8 +27,8 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
 
-//	implementation project(path: ':spring:spring-kafka:core')
-//	compileOnly 'ru.education:core:0.0.1-SNAPSHOT'
+	implementation project(path: ':spring:spring-kafka:core')
+	compileOnly 'ru.education:core:0.0.1-SNAPSHOT'
 }
 
 test {
