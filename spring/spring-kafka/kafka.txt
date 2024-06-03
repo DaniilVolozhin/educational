@@ -101,10 +101,23 @@ config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
 1. retryable error - временная проблема, может быть решена переотправкой сообщения, причиной может быть упавшая реплика
 2. non-retyable - постоянная ошибка, переотправка не поможет. Например, превышен размер сообщения.
 
+Kafka idempotent:
+поведение с отключенным idempotent
+  продюсер отправляет запрос и кафка его получает, сохранет эвент, но поддтверждение полчение не дошло до продюсера,
+    продюсер отправит повторно и будет еще сохранен еще 1 эвент
 
+поведение по умолчанию: с включенным idempotent
+  продюсер отправляет запрос и кафка его получает, сохранет эвент, но поддтверждение полчение не дошло до продюсера,
+    продюсер отправит повторно и будет и новый не будет сохранен, будет отправлено подтверждение о сохранении
+  дважды одно и то же сообщение не сохраняется
+
+
+consumer:
+ErrorHandlingDeserializer
+  позволяет прочитать сообщение, обработать если возможно, если нет, то в случае ошибки offset будет переведен на следующую запись
 
 .\kafka-server-start.bat ..\..\config\kraft\server1.properties
 .\kafka-server-start.bat ..\..\config\kraft\server2.properties
 .\kafka-server-start.bat ..\..\config\kraft\server3.properties
 .\kafka-console-consumer.bat --bootstrap-server localhost:9092,localhost:9094 --topic product-created-events-topic --property "print.key=true"
-
+.\kafka-server-stop.bat
