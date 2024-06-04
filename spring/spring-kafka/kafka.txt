@@ -116,6 +116,9 @@ consumer:
 ErrorHandlingDeserializer
   позволяет прочитать сообщение, обработать если возможно, если нет, то в случае ошибки offset будет переведен на следующую запись
 
+Dead Letter Topic(DLT)
+  механизм обработки сообщений с ошибкой десериализации
+
 .\kafka-server-start.bat ..\..\config\kraft\server1.properties
 .\kafka-server-start.bat ..\..\config\kraft\server2.properties
 .\kafka-server-start.bat ..\..\config\kraft\server3.properties
