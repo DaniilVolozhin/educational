@@ -1,4 +1,4 @@
-package ru.education.spring.kafka.config;
+package ru.education.spring.kafka.config.kafka;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,6 +8,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
@@ -20,10 +21,13 @@ import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.util.backoff.FixedBackOff;
+import ru.education.spring.kafka.exception.NonRetryableException;
+import ru.education.spring.kafka.exception.RetryableException;
 
-//@Configuration
+@Configuration
 @AllArgsConstructor
-public class WithDLTKafkaConfig {
+public class KafkaConfig {
 
   private final Environment environment;
 
@@ -47,9 +51,14 @@ public class WithDLTKafkaConfig {
 
   @Bean
   public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(
-      ConsumerFactory<String, Object> consumerFactory, KafkaTemplate<String, Object> kafkaTemplate) {
-    DefaultErrorHandler errorHandler =
-        new DefaultErrorHandler(new DeadLetterPublishingRecoverer(kafkaTemplate));
+      ConsumerFactory<String, Object> consumerFactory,
+      KafkaTemplate<String, Object> kafkaTemplate) {
+    DefaultErrorHandler errorHandler = new DefaultErrorHandler(
+        new DeadLetterPublishingRecoverer(kafkaTemplate),
+        new FixedBackOff(3000, 3)
+    );
+    errorHandler.addNotRetryableExceptions(NonRetryableException.class);
+    errorHandler.addRetryableExceptions(RetryableException.class);
 
     ConcurrentKafkaListenerContainerFactory<String, Object> factory =
         new ConcurrentKafkaListenerContainerFactory<>();

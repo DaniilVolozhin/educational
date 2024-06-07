@@ -123,4 +123,5 @@ Dead Letter Topic(DLT)
 .\kafka-server-start.bat ..\..\config\kraft\server2.properties
 .\kafka-server-start.bat ..\..\config\kraft\server3.properties
 .\kafka-console-consumer.bat --bootstrap-server localhost:9092,localhost:9094 --topic product-created-events-topic --property "print.key=true"
+.\kafka-console-consumer.bat --bootstrap-server localhost:9092,localhost:9094 --topic product-created-events-topic.DLT --property "print.key=true"
 .\kafka-server-stop.bat
