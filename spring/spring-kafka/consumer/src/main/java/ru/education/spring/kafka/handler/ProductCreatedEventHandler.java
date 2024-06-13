@@ -11,7 +11,7 @@ import ru.education.spring.kafka.event.ProductCreatedEvent;
 //@Component
 @KafkaListener(topics = "product-created-events-topic")
 @RequiredArgsConstructor
-public class ProduceCreatedEventHandler {
+public class ProductCreatedEventHandler {
 
   private final RestTemplate restTemplate;
 

@@ -16,9 +16,9 @@ import ru.education.spring.kafka.exception.RetryableException;
 
 @Slf4j
 @Component
-@KafkaListener(topics = "product-created-events-topic")
+@KafkaListener(topics = "product-created-events-topic"/*, groupId = "product-created-events-topic"*/)
 @RequiredArgsConstructor
-public class RetryableProduceCreatedEventHandler {
+public class RetryableProductCreatedEventHandler {
 
   private final RestTemplate restTemplate;
 

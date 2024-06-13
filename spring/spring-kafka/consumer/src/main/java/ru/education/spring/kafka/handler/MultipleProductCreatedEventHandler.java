@@ -7,7 +7,7 @@ import ru.education.spring.kafka.event.ProductDeletedEvent;
 
 //@Component
 @KafkaListener(topics = "product-created-events-topic")
-public class MultipleProduceCreatedEventHandler {
+public class MultipleProductCreatedEventHandler {
   /*
   * такая конструкция позволяет из одного топика читать разные объекты
   * и автоматически определять их в обработчик по типу объекта

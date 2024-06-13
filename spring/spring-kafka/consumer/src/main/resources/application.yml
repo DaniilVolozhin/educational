@@ -1,5 +1,7 @@
 server:
-  port: 8991
+  #  random port
+    port: 0
+#  port: 8991
 spring:
   kafka:
     consumer:

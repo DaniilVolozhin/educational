@@ -119,6 +119,24 @@ ErrorHandlingDeserializer
 Dead Letter Topic(DLT)
   механизм обработки сообщений с ошибкой десериализации
 
+Consumer Group
+  механизм который позволяет нескольким consumer в паралель читать сообщение из разных партиций
+  groupId у consumer в группе должен быть один и тот же
+  У партиции может быть только один consumer. У consumer несколько партиций
+  Если не указан то будет происходить чтение всех сообщений
+  Можно указать в
+    @KafkaListener(groupId)
+    spring.kafka.consumer.group-id: product-created-events
+    configMap.put(ConsumerConfig.GROUP_ID_CONFIG,
+            environment.getProperty("spring.kafka.consumer.group-id"));
+
+Heart Beats
+  механизм который используется consumer что бы каждые 3 секунды слать kafka cluster сообщение что он живой
+  default 3 секунды, но можно изменить
+  в случае если consumer не ответил, то происходит ребалансировка
+
+
+
 .\kafka-server-start.bat ..\..\config\kraft\server1.properties
 .\kafka-server-start.bat ..\..\config\kraft\server2.properties
 .\kafka-server-start.bat ..\..\config\kraft\server3.properties
