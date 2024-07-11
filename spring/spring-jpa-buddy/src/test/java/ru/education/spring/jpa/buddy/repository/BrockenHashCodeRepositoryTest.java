@@ -1,4 +1,4 @@
-package ru.education.spring.repository;
+package ru.education.spring.jpa.buddy.repository;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -7,9 +7,9 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.education.spring.entities.Comment;
-import ru.education.spring.entities.Post;
-import ru.education.spring.entities.User;
+import ru.education.spring.jpa.buddy.entities.Comment;
+import ru.education.spring.jpa.buddy.entities.Post;
+import ru.education.spring.jpa.buddy.entities.User;
 
 @SpringBootTest
 class BrockenHashCodeRepositoryTest {
@@ -23,7 +23,7 @@ class BrockenHashCodeRepositoryTest {
 
   @Test
   void userSetTest() {
-    User  user = new User();
+    User user = new User();
     Set<User> set = new HashSet<>();
 
     set.add(user);

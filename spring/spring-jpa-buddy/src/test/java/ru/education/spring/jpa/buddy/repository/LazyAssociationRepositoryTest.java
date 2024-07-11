@@ -1,4 +1,4 @@
-package ru.education.spring.repository;
+package ru.education.spring.jpa.buddy.repository;
 
 import jakarta.persistence.Persistence;
 import jakarta.persistence.PersistenceUtil;
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import ru.education.spring.entities.User;
+import ru.education.spring.jpa.buddy.entities.User;
 
 @Transactional
 @SpringBootTest

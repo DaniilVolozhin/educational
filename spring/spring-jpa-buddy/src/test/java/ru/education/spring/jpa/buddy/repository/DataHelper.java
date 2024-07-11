@@ -1,4 +1,4 @@
-package ru.education.spring.repository;
+package ru.education.spring.jpa.buddy.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;

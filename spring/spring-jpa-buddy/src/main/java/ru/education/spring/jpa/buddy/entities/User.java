@@ -1,4 +1,4 @@
-package ru.education.spring.entities;
+package ru.education.spring.jpa.buddy.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

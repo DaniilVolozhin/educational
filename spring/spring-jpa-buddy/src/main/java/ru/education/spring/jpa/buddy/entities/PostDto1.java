@@ -1,0 +1,20 @@
+package ru.education.spring.jpa.buddy.entities;
+
+import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * DTO for {@link Post}
+ */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class PostDto1 implements Serializable {
+
+  private Long postId;
+  private String date;
+  private String text;
+  private String email;
+}

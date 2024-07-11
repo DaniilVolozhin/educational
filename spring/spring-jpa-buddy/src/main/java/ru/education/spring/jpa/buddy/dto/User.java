@@ -1,30 +1,26 @@
-package ru.education.spring.entities;
+package ru.education.spring.jpa.buddy.dto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-@EqualsAndHashCode
 @Getter
 @Setter
 @Entity
-@Table(name = "comment")
-public class Comment {
+@Table(name = "user")
+public class User {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id", nullable = false)
   private Long id;
 
   @ManyToOne
-  @JoinColumn(name = "user_id")
-  private User user;
+  @JoinColumn(name = "post_2_entity_id")
+  private ru.education.spring.jpa.buddy.dto.Post2Entity post2Entity;
+
 }
