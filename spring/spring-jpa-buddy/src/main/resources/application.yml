@@ -1,0 +1,4 @@
+server:
+#  random port
+#  port: 0
+  port: 8990

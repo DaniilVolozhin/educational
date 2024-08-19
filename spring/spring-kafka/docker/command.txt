@@ -1,0 +1,6 @@
+
+docker-compose --env-file environment.env up
+  что бы указать файл с переменными для HOSTNAME
+
+docker-compose exec kafka-1 /opt/bitnami/kafka/bin/kafka-topics.sh --list --bootstrap-server localhost:9092
+  позволяет подключиться к контейнеру и вызвать в файлах кафки исполняемый файл и вывести список топиков

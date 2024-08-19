@@ -1,0 +1,150 @@
+Kafka:
+1. .\kafka-storage.bat random-uuid
+	тут получаем id
+2.  .\kafka-storage.bat format -t id -c ..\..\config\kraft\server.properties
+	форматируем лог для совместимости с kraft
+3. .\kafka-server-start.bat ..\..\config\kraft\server.properties
+	запуск kafka с дефолтным конфигом
+4. .\kafka-server-stop.bat
+	остановаить все сервера кафки
+
+создание топика kafka:
+1. .\kafka-topics.bat --create --topic payment-created-events-topic --partitions 3 --replication-factor 3 --bootstrap-server localhost:9092,localhost:9094
+2. .\kafka-topics.bat --list --bootstrap-server localhost:9092,localhost:9094
+	посмотреть список топиков
+3. .\kafka-topics.bat --describe --bootstrap-server localhost:9092,localhost:9094
+	посмотреть список топиков с конфигурацией
+4. .\kafka-topics.bat --delete --topic payment-created-events-topic --bootstrap-server localhost:9092
+	удаляет топик, настройка delete.topic.enable=true(по умолчанию)
+
+Обновление топика:
+1. .\kafka-configs.bat --bootstrap-server localhost:9092 --alter --entity-type topics --entity-name product-created-events-topic --add-config min.insync.replicas=1
+  изменить кол-во серверов которые должны быть в реплике с лидером при подтверждении
+
+работа с топиками:
+запись:
+1. .\kafka-console-producer.bat --bootstrap-server localhost:9092,localhost:9094 --topic payment-canceled-events-topic
+	отправляет сообщение в указанный топик, если топика нет и auto.create.topics.enable=true создастся автоматически
+2. .\kafka-console-producer.bat --bootstrap-server localhost:9092,localhost:9094 --topic payment-canceled-events-topic --property "parse.key=true" --property "key.separator=:"
+	отправляет сообщение в указанный топик с ключом
+		одинаковый key у сообщения попадет в одину портицию, и будет прочитаны в порядке добавления
+		в рамках key, разные key и null читаются в разнобой
+
+чтение:
+3. .\kafka-console-consumer.bat --bootstrap-server localhost:9092,localhost:9094 --topic payment-canceled-events-topic --from-beginning
+	читает все сообщения с начала из указанного топика
+4.  .\kafka-console-consumer.bat --bootstrap-server localhost:9092,localhost:9094 --topic payment-canceled-events-topic --from-beginning --property "print.key=true"
+	читает все сообщения с начала из указанного топика с ключом
+5.  .\kafka-console-consumer.bat --bootstrap-server localhost:9092,localhost:9094 --topic payment-canceled-events-topic --from-beginning --property "print.key=true" --property "print.value=false"
+	читает все сообщения с начала  из указанного топика с ключом без значения
+6.  .\kafka-console-consumer.bat --bootstrap-server localhost:9092,localhost:9094 --topic payment-canceled-events-topic --property "print.key=true"
+	читает новые сообщения из указанного топика с ключом
+
+Конфиги кафка:
+spring config:
+
+spring.kafka.producer.acks=1
+  параметр отвечает за то сколько подтверждений получения сообщения должен получить producer от kafka broker
+  значение по умолчанию 1, означает что ждет подтверждение получения только от лидера
+  all означает что ждет подтверждение от всех брокеров синхронизированных с лидером на момент получения(учитывать min.insync.replicas)
+  0 не получать подтверждение
+  2 получать подтверждение от лидера и еще одной реплики
+
+spring.kafka.producer.retries=10
+  указывается максимальное количесто переотправок которые сделает producer до подтверждения получения сообщения
+  не рекомендуется к использованию, рекомендуется настраивать через timeout
+
+spring.kafka.producer.properties.retry.backoff.ms=100
+  указывает с каким интервалом повторять переотправку сообщения до подтверждения получения сообщения
+    default 100 ms, 10 раз за секунду
+    не рекомендуется к использованию, рекомендуется настраивать через timeout
+
+spring.kafka.producer.properties.delivery.timeout.ms=120000
+  указывается максимальное время на переотправку сообщения, после чего TimeoutException
+  default 120000 ms, 2 min
+  состоит из delivery.timeout.ms >= linger.ms + request.timeout.ms
+
+spring.kafka.producer.properties.linger.ms=0
+  указывается время в течении которого producer накапливает сообщения перед отправкой их пачкой
+  default 0 ms, все сообщения отправлятся по 1 штуке
+  используется для повышения производительности
+
+spring.kafka.producer.properties.request.timeout.ms=30000
+  default 30000ms
+  указывается время которые producer ждет подтверждение получения сообщения от kafka broker
+  при превышение будет TimeoutException
+
+spring.kafka.producer.properties.enable.idempotence=true
+  default true
+  включает идемпотентность для кафка брокера
+  рекомендуется всегда указывать это свойство явно
+  если поставить producer.acks=all idempotence останется true,
+    если producer.acks=5 idempotence не явно переведен в false,
+    если producer.acks=5 и задать свойство idempotence=true, то получим configuration exception
+  работать будет как обычно, если producer.acks=all, producer.retries > 0,
+    producer.properties.max.in.flight.requests.per.connection <= 5
+
+spring.kafka.producer.properties.max.in.flight.requests.per.connection=5
+  сколько запросов может быть отправлено и по которым еще не пришел acks от kafka,
+
+spring.kafka.producer.properties.max.request.size=1048576
+  default 1048576
+  указывается максимальный размер сообщения который будет отправлен в кафку
+
+
+kafka config:
+min.insync.replicas=0
+  минимальное количество реплик которые всегда должны быть в синхроне с лидером
+  указывается для топика
+  реплик топика может быть 3, а min.insync.replicas=2, 1 лидер, 2 реплики, одна из реплик в моменте обязательно должны быть сихронизированан с лидером для указаного топика
+    другая же может быть не синхронизирована в моменте, но сихнронизирована в будущем
+
+java config:
+config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
+
+2 типа ошибок:
+1. retryable error - временная проблема, может быть решена переотправкой сообщения, причиной может быть упавшая реплика
+2. non-retyable - постоянная ошибка, переотправка не поможет. Например, превышен размер сообщения.
+
+Kafka idempotent:
+поведение с отключенным idempotent
+  продюсер отправляет запрос и кафка его получает, сохранет эвент, но поддтверждение полчение не дошло до продюсера,
+    продюсер отправит повторно и будет еще сохранен еще 1 эвент
+
+поведение по умолчанию: с включенным idempotent
+  продюсер отправляет запрос и кафка его получает, сохранет эвент, но поддтверждение полчение не дошло до продюсера,
+    продюсер отправит повторно и будет и новый не будет сохранен, будет отправлено подтверждение о сохранении
+  дважды одно и то же сообщение не сохраняется
+
+
+consumer:
+ErrorHandlingDeserializer
+  позволяет прочитать сообщение, обработать если возможно, если нет, то в случае ошибки offset будет переведен на следующую запись
+
+Dead Letter Topic(DLT)
+  механизм обработки сообщений с ошибкой десериализации
+
+Consumer Group
+  механизм который позволяет нескольким consumer в паралель читать сообщение из разных партиций
+  groupId у consumer в группе должен быть один и тот же
+  У партиции может быть только один consumer. У consumer несколько партиций
+  Если не указан то будет происходить чтение всех сообщений
+  Можно указать в
+    @KafkaListener(groupId)
+    spring.kafka.consumer.group-id: product-created-events
+    configMap.put(ConsumerConfig.GROUP_ID_CONFIG,
+            environment.getProperty("spring.kafka.consumer.group-id"));
+
+Heart Beats
+  механизм который используется consumer что бы каждые 3 секунды слать kafka cluster сообщение что он живой
+  default 3 секунды, но можно изменить
+  в случае если consumer не ответил, то происходит ребалансировка
+
+
+
+.\kafka-server-start.bat ..\..\config\kraft\server1.properties
+.\kafka-server-start.bat ..\..\config\kraft\server2.properties
+.\kafka-server-start.bat ..\..\config\kraft\server3.properties
+.\kafka-console-consumer.bat --bootstrap-server localhost:9092,localhost:9094 --topic product-created-events-topic --property "print.key=true"
+.\kafka-console-consumer.bat --bootstrap-server localhost:9092,localhost:9094 --topic product-created-events-topic.DLT --property "print.key=true"
+.\kafka-server-stop.bat

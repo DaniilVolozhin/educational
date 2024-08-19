@@ -1,6 +1,16 @@
 rootProject.name = 'educational'
 
-include 'tddByExampleWithJUnit5', 'sweater'
-include 'all-library.datajpa','all-library.library','all-library.library-orm'
-include 'taco.taco-cloud', 'taco.taco-cloud-all.taco-cloudREST'
-include 'ServerTOMCat', 'PortfolioProgect'
+include 'tddByExampleWithJUnit5', 'sweater', 'patterns', 'java'
+include 'all-library:datajpa', 'all-library:library', 'all-library:library-orm'
+include 'taco', 'taco:taco-cloud', 'taco:taco-cloud-all:taco-cloudREST'
+include 'tomcat-servlet:ServerTOMCat', 'tomcat-servlet:project-with-auth'
+include 'Spring_потрошитель'
+include 'spring',
+        'spring:spring_cloud_feign'
+include 'spring:spring-kafka',
+        'spring:spring-kafka:producer',
+        'spring:spring-kafka:consumer',
+        'spring:spring-kafka:core'
+include 'spring:spring-integration'
+include 'spring:spring-async'
+include 'spring:spring-jpa-buddy'
