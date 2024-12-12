@@ -14,3 +14,4 @@ include 'spring:spring-kafka',
 include 'spring:spring-integration'
 include 'spring:spring-async'
 include 'spring:spring-jpa-buddy'
+include 'spring:01-spring-xml'
