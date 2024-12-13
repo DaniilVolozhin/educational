@@ -1,0 +1,2140 @@
+
+
+@Bean
+	("name_bean") можно указать имя бина, если не указано, то имя это название метода
+	позволяет создать бин
+	в нестатичесих методах
+	зависимости бинов в параметрах метода
+
+@Configuration
+	все бины располагаются в классах помеченных этой аннотацией
+	классы при использование обычно делятся по слою, технологии
+	класс должен иметь конструктор без параметров
+	класс конфигурации максимально плоский, без иерархий
+	
+	аннотации которые влючают в себя @Configuration:
+		@SpringBootApplication
+		@TestConfiguration
+		@EnableWebSecurity
+
+@EnableJpaRepositories
+	аннотация включает jpaRepositories
+	означает что начиная с этого класса в глубь пакетов будет искать @Entity @Repository
+	Должны стоять на класса с @Configuration
+
+@Import
+	(class_name.class) импортирует файл конфигурации с бинами
+	можно испортировать бин к классу в тестах
+
+
+@ComponentScan
+	(basePackages = "имя_пакета") будут искаться в указаном пакете файлы с аннотациями
+		@Configuration, @Component, @Service, @Controller
+	если не задан пакет то ищет по пакетам начная с текущего вглубь
+	аннотация @SpringBootApplication включает в себя эту аннотацию
+	(excludeFilters = @ComponentScan.Filter(type = FilterType.*, classes = Class_name.class))
+	 	*ASSIGNABLE_TYPE позволяет исключить сканирование бинов по типу класса
+
+@ComponentScans
+	включает в себя много ComponentScan
+
+
+
+@Component
+	("name_bean") можно указать имя бина, и для наследников
+	создает бин класса c именем класса с маленькой буквы
+
+@Service
+	создан для бизнес-сервисов
+	содержит в себе @Component
+
+@Controller
+	для sprign mvc контроллеров
+	содержит в себе @Component
+
+@Repository
+	используется для JPA репозиториев
+	содержит в себе @Component
+
+
+
+@Required
+	аннотация которая указывает что надо задать свойство в сеттере и передать параметры
+ 
+@Autowired
+	внедряет параметры в класс которые являются бинами
+	можно использовать на конструктере, поле класса, сеттере, любой метод
+	со спринга 4.2 если конструктор в классе один, то подразумевается что он @Autowired
+
+@Qualifier
+	позволяет указать id бина при @Autowired
+
+	 
+
+Property-files:
+@PropertieSource
+	("classpath:name_prop.properties") можно указать имя properties,
+	которые хранятся в ресурсах src/main/resouces или */test/*
+	ставится на классе который помечен @Configuration
+	(В Spring Boot есть) - Что бы использовать property-file нужно создать бин PropertySourcesPlaceholderConfigurer
+
+@Value
+	("${name_prop.value_prop}")или("#{}") параметры для указания ключа
+	эта анотация используется что бы внедрят значения из properties
+	может использоваться на поле класса, конструкторе, методе
+	передача параметров из командой строки в бин -Dpropery.name=val @Value("${env.property.name}")
+
+
+Локализация приложения и интернацианализация:
+
+bundle - файл с значениями по типу мапы
+можете поменять местонахождение бандлов в
+application.yml:
+	spring.messages.basename: path/to/i18n/messages
+Что бы использовать бандлы нужно создать бин MessageSource (Spring Boot уже есть)
+ReloadableResourceBundleMessageSource ms
+ms.setBasename("/path_bundle_in_resource")
+ms.setDefaultEncoding("enc_name")
+
+что бы получит значение, необхомо в класс добавить MessageSource 
+и сделать getMessage("key", params, local)
+
+Utils классы лучше делать бинами
+
+
+@RestController
+	
+
+AOP aspects, аспекто ориентированное программирование:
+Представители Spring AOP и AspectJ
+
+cross-cutting служебная функциональность(ортоганальная, пересекает все слои)
+cross-cutting это:
+1. логгирование
+2. авторизация
+3. обработка исключений
+4. транзакции
+5. кеширование
+6. бенчмарк
+
+pointcut
+	работает только с публичными методами
+	это выражение в (""), то есть язык написания запроса для аспектов
+	method_name(..) метода с любыми параметрами
+	* перед package_name публичные методы
+	* на классе или методе это все в пакете или в классе, классы или методы
+	"execution(* name_package.class_name.method_name(..))"
+		публичные методы в классе с любимыми параметрами
+	"execution(public Type_return package_name.class_name.mehtod_name(type_params))"
+		публичный конкретный метод с конкретными параметрами
+	"execution(* package_name.class_name.*(..))"
+		публичные методы к классе с любыми параметрами
+	"execution(* package_name.*.*(..))"
+		все классы с публичными методами с любыми параметрами
+	"within(package_name.class_name)"
+		публичные методы к классе с любыми параметрами
+	"within(package_name.*)"
+		все методы внутри классов внутри пакета
+	"target(package_name.interface_name)"
+		все методы реализующие этот инерфейс
+	"@target(package_name.interface_name)"
+		все методы в классе указанной аннотации
+	"@annotation(package_name.interface_name)"
+		методы помеченные аннотацией
+Хороший тон, делать аспект с аннотацией и помечать ней то что нужно обернуть
+
+
+
+@EnableAspectJAutoProxy
+	на классе конфигурации, включает работу с самописными аспектами
+
+@Aspect
+	ставиться на класс в котором реализованы методы с функционалом
+	аннотация которая нужна для того что бы аоп заработал
+	на класс с @Aspect должен ставиться @Component, аспекты это тоже бины(когда spring aop)
+
+
+@Before
+	("условие")
+	ставитсья на метод в классе который помечен @Aspect 
+	вызов будет только до вызова оригинального метода из "условия"
+	на вход приинимает joinPoint
+	
+@After
+	вызов после точки входа(даже после исключения)
+	на вход приинимает joinPoint
+
+@Around
+	до и после точки входа
+	на вход приинимает ProceedingJoinPoint 
+	joinPoint.proceed(); вызов оригинального метода + return obj;
+
+@AfterReturning
+	после точки входа, если завершилась корректно
+	на вход приинимает joinPoint
+
+@AfterThrowing
+	(pointcut = "условие")
+	(throwing = "error") и в параметрах метода Throwable error
+	в случае исключения в точке входа
+	на вход приинимает joinPoint
+
+ 
+
+Spring Boot:
+
+баннер - картинка при запуске приложения. лежит в папке resource
+	${application.version} implementation-version из manifest.mf, по умолчанию project.version из maven pom
+	${application.title} implementation-title из manifest.mf, по умолчанию project.artifactId из maven pom
+	и прочее
+
+@SpringBootApplication
+	включает спринг бут
+	включает в себя аннотации @SpringBootConfiguration, @EnableAutoConfiguration, @EnableWebMvc @ComponentScan
+
+@EnableAutoConfiguration
+	(exclude = {name_class.class}) позволяет исключить автоконфигурацию классов
+	включает магию автоконфигурации спринг бута
+
+@Conditional
+	(class_name.class) в параметре указывается класс,который должен присутсвовать что бин был создан
+	ставиться на класс
+
+@ConditionalOnProperty
+	(value = "app_prop_value.key", havingValue = "value") можно указать что если значение app_prop_value.key имеет значение value то создать бин
+	позволяет задать условия для создания бина
+	ставиться на класс
+
+@ConditionalOnСlass
+	(name = "class_name") в параметре указывается класс,который должен присутсвовать что бин был создан
+	позволяет задать условия для создания бина
+	ставиться на класс
+
+@ConfigurationProperties
+	("prefix_on_key")
+	ставить на классе, сам класс содержит поля которые являются key из application.properties или yml файла
+	ставиться вместе с @Component, класс обычно называется ApplicationSettings
+@EnableConfigurationProperties
+	(file_name.yml) указывается имя файла с пропертями
+	работает вместе с @ConfigurationProperties
+
+можно создать автоматическое описание метаданных проекта через spring-boot-configuration-processor, файл META-INF/spring-configuration-metadata.json
+
+
+SpringTest:
+@SpringBootTest
+	позволяет писать тесты с поднятием контекста Spring Boot
+	ставиться на класс
+	включает работу с @MockBean
+	по умолчанию включает в себя @ExtendWith({SpringExtension.class})(не во всех старых версиях)
+	ищет класс @SpringBootConfiguration, находит все конфигурации и бины,
+		поднимает все кроме @MockBean. Можно использовать nesed static класс с @Configuration
+		в котором сконфигурировать контекст, где создать свои @Bean для тестов,
+		в этом случае поиска @SpringBootConfiguration не будет
+
+@RunWith
+	(SpringRunner.class) класс старта тестов
+	аннотация для запуска тестов для JUnit4
+
+@ExtendWith({SpringExtension.class})
+	({SpringExtension.class}) класс старта тестов
+	аннотация для запуска тестов для JUnit5
+
+@MockBean
+	создает мок который перед каждый тестом заменяет исходный бин
+	используется для зависимостей которые используется в тестируемом бине
+
+@Autowired
+	используется в тестах для внедрения объекта который должен быть протестирован
+
+@Configuration
+	может использоваться на nested static классах,
+		если создать в таком классе бины то только они попадут в контекст
+	останавливает поиск @SpringBootConfiguration который в аннотации @SpringBootTest
+	можно не создавать бины, а использовать @ComponentScan в котором указать
+		конкретный пакет или класс с бинами для теста
+	можно так же использовать с @Import(class_name.class) у этого класса должно быть задано имя
+		в создании, а не сгенерированно автоматически
+
+@SpringBootConfiguration
+	ставить на класс с тестовой конфигурацией в этом же пакете где нужно сделать настройку
+	позволяет создать свой контекст для теста
+	
+@TestConfuguration
+	используется на классе
+	если использовать на внутреннем классе,
+		то позволяет подменить бин в контексе или дополнить контекст,
+		не прекращает поиск @SpringBootConfiguration, это доп конфигурция,
+		что бы работало нужно бин оверрацдинг ключить
+
+@DispleyName
+	("test_name_in_idea") будет оборажаться это имя вместо класса или метода
+	ставить на класс или метод
+
+
+Spring-boot-actuator:
+позволяет работать с: healthchecks, metrics, admin methods(shutdown)
+
+открывается по host:port/actuator
+
+
+Скоп видимости Bean:
+singleton - 1 на все приложение
+prototype - в каждый бин свой собственный объект, создается когда зависимость потребует этот бин
+	не спасает от проблем с thread-safe
+	иногда используется для кешов, утилитных классов
+request - на каждый web запрос свой бин
+	спасает от проблем с многопоточность
+	используется при аутентификации
+session - на каждую servlet http-сессию свой бин
+	используется для корзины покупок, настроек пользователя
+
+@Scope
+	("область_видимости") или (value = "область_видимости") объявляет область видимости бина
+	(proxyMode = ScopedProxyMode.INTERFACES) ставиться на request, session бине,  создает прокси для управления бинами после инжекта в синглетон, request, session бинов
+	ставить на класс или метод с @Bean
+
+Этапы создания бина:
+
+init
+	вызывается после afterPropertiesSet, все зависимости бина будут проинициализированны
+	при тестах с этим методом без поднятия контекста, нужно его вызывать
+	при тестах с контекстом не нужно
+	используют обычно для 
+		соединения с БД или кастомным ресурсам
+		 получения методанных сервиса
+@PostConstruct
+	ставиться на метод который у бина станет методом init
+или
+можно унаследоваться от InitializaingBean и переопределить метод afterPropertiesSet()
+
+destroy
+	вызывается при корректом завершении программы
+	используется для закрытия доступа к ресурсам
+@PreDestroy
+	ставиться на метод который станет destroy методом
+или
+можно унаследоваться от DisposableBean и переопределить метод destroy()
+
+
+получения спринг контекста в бине:
+	можно через @Autowired ApplicationContext
+	так же унаследоваться от ApplicationContextAware и переопределить метод setApplicationContext() и там засетить поле в класс, класс наследник должен быть bean
+
+Кастомизация бинов:
+BeanPostProcessor - интерфей который имеет 2 метода postProcessBeforeInitialization и postProcessAfterInitialization
+	используется для создания прокси для бинов, делать обертки, кастомные инжекты
+
+
+События в спринге:
+ApplicationEventMulticaster
+	бин для переопределения асинхронности в событиях спринг
+	реализацию гуглить под задачи
+
+событие
+	что бы создать событие унаследоваться от ApplicationEvent
+пабришер
+	@Autowired ApplicationEventPublisher в свой класс где генерируется событие
+	событие = new Событие(this, other params);
+	метод для добавления собития applicationEventPublisher.publishEvent(событие);
+слушатель
+	@Component класс который наследник
+	implements ApplicationListeneer<имя_класса_события>,
+		переопределить метод onApplicationEvent(имя_класса_события)
+		или
+	в классе на метод @EventListener в методе параметр(имя_класса события)
+
+
+Профили у бинов:
+не бест практисес
+@Profile
+	("название_профиля") указывается профиль при котором должен быть создан класс
+	ставиться на класс бин
+	создает бин в зависимости от профиля
+
+
+prfile yml ---
+
+
+spring shell:
+spring shell starter
+	используется для вызова команд через командную строку
+
+@ShellComponent
+	ставить на класс
+	набор методов
+
+@ShellMethod
+	(value = "описание команды")
+	(key = {"command_name1", "command_name2"}) можно указать название команд на которые будет реагировать
+	ставить на метод
+	это набор команд
+@ShellOption
+	по умолчанию с 2.0.0 не обязательно, но есть важные параметры
+	ставиться в параметры
+	аргументы к командам, дополнительные аргументы передаются  --arg
+@ShellMethodAvailability
+	("method_name") можно передать метод который будет вызываться перед методом на котором стоит
+	("command_name") если стоит на методе с проверкой,
+		то нужно передать команды "command_name" для котоых включить проверку
+
+	Availability.unavailable("massage") не прошел проверку, прервеи выполнение с message
+	Availability.available() будет вызван основной метод
+	позволяет управлять доступностью команд
+	ставить на метод, с командой или проверкой
+
+
+Работа с базами данных:
+
+DDL data defenition language - create table
+dml data manipilation language select, insert
+dcl data control language - deny, grant
+dtl data transaction language - commit
+pl/sql procedural language - if, loop, while
+
+jdbc - это стандарт описания драйвера, драйвера для работы с бд
+
+dao - data access object
+	дополнительная прослойка между бизнесом и бд
+	для каждой бд своя
+	в терминах orm это репозиторий
+
+Spring JDBC:
+что бы создать схему базы данных можно использовать файл schema.sql и для данных data.sql, testdata.sql лежать должны в resource
+
+DataSource
+	часть спецификации jdbc
+	подзволяет абстрагироваться для коннектов и пулов
+	содержит в себе драйвер базы, url db, username и password и многое другое
+	создется как @Bean в spring jdbc
+
+JdbcTemplate
+	главный класс в spring jdbc
+	выполняет sql запросы, итерирует по результатам, ловит исключения
+	для работы необходимо dataSource, RowMapper и sql-запрос
+	можно сконфигурировать 1 раз, можно на каждый dataSource
+	являеся наследником jdbcOperation
+	операция select выполняется через jdbc.queryForObject, jdbc.query
+	операции insert, update, delete выполняются через jdbc.update и возвращается число обработанных строчек
+	прочие запросы можно выполнить через execute, он является универсальным для всех операций
+	NamedParametsJdbcTemplate позволяет вписывать в sql параметры через :value_params, а параметры передавать в map key-column_name, value_value_params
+RowMapper
+	используеся для того что бы смапить ответ из resultSet в объект java
+	resultSet это набор строк из таблицы
+	
+Spring Boot Starter Jdbc:
+	по указанным параметрам в application.yml создат dataSource
+	загрузит data.sql, schema.sql, testdata.sql
+
+Spring JdbcTest:
+@JdbcTest
+	понимает чать контекста, ответсвенную за БД.
+		И выполняет schema.sql data.sql testdata.sql. откуда брать файл указывается в resources
+		в файле application.yml
+	по умолчанию создает в начале теста и отказывает в конце транзакцию
+		можно отключить на весь класс @Transactional(propogation=NOT_SUPPORTED)
+	для работы нужен JUnit
+	включает в себя аннотацию @ExtendWith(SpringExtension.class)(не во всех старых версиях)
+	работает с аннотацией @Import(name_dao_jdbc.class), @Autowired name_dao_jdbc тестируемый класс
+
+@DirtiesContext
+	(methodMode = DirtiessContext.MethodMode.*) обновлять контекст у метода в зависимости от *
+		BEFORE_METHOD обновлять контекст до метода
+        	AFTER_METHOD обновлять контекст после метода
+	(classMode = DirtiessContext.ClassMode.*) обновлять контекст в зависимости от *
+		BEFORE_CLASS обновлять контекст до этого класса
+        	BEFORE_EACH_TEST_METHOD обновлять контекст до каждого метода этого класса
+        	AFTER_EACH_TEST_METHOD обновлять контекст после каждого метода этого класса
+        	AFTER_CLASS обновлять контекст после этого класса
+	(hierarchyMode = DirtiessContext.ClassMode.*)
+		гуглить
+	аннотация позволяет управлять состоянием контекста во время тестов
+
+
+ORM:
+минусы
+	производительность падает
+	нет возможностей плюшек в бд и нет доступа к нативному sql бд
+
+orm object relation mapping - позволяет отображать сущности на бд и наоборот
+jpa java persistence api - набор аннотаций(и интерфейсов), для разметки классов-сущностей
+	позволяет orm понимать как ей работать с классами
+
+Минимальный набор для hibernate @Entity и @Id
+
+@Entity
+	говорит orm что этот класс - сущность
+	orm считывает метаданные класса и генерирует запросы и тд
+
+@Id
+	помечает поле как id
+	ставиться на поле класса
+	используется для простого ключа
+
+@EmbeddedId
+	помечает поле как id
+	ставиться на поле класса
+	используется для составного ключа
+
+@GeneratedValue
+	позволяет для id указать стратегию генерации id
+	GenerationType.:
+		AUTO - автоматический выбор
+			не рекомендуют, рваный id, повторения
+		IDENTITY - на основе автоинкременого поля таблицы
+		SEQUENCE - на основе заданной последовательности(по умолчанию hibernate_sequence)
+		TABLE - на основе заданной таблицы с значениями поля(по умолчанию hibernate_sequence)
+			не рекомендуют, долго, читать базу, писать в базу
+
+@Table
+	(name = "name_table") name_table имя таблицы в бд
+	задает имя таблицы с которой сопоставиться объект
+	ставить над классом
+	можно указать и другие параметры schema, indexes, catalog, uniqueConstraints
+
+@Column
+	задает имя колонки с которой сопоставиться поле класса
+	ставиться на поле класса
+	в ней можно задать ограничения
+
+@OneToOne
+	используется для сущностей один к одному
+	может стоять только в одном из классов связи
+	работает с @JoinColumn
+@OneToMany
+	используется для связи один ко многим
+	может стоять только в одном из классов связи
+	работает с @JoinColumn
+@ManyToOne
+	используется для связи многие к одному
+	может стоять только в одном из классов связи
+	работает с @JoinColumn
+@ManyToMany
+	используется для связи многие ко многим
+	может стоять только в одном из классов связи
+	работает с @JoinTable
+
+общие атрибуты аннотация со связями:
+	targetEntity
+		определяет сущность на том конце связи
+		ипользуется только когда не типизированный объект для связи
+	cascade
+		позволяет указать какие операции будут каскадно влиять на связанные сущности
+		ALL, PERSIST, MERGE, REMOVE, REFRESH, DETACH
+		нет значения по умолчанию
+	fetch
+		позволяет указать как необходимо загружать связи сущности
+		eager - загружать сразу, в дополнительном запросе
+		lazy - прокси вместо связи, вызов метода отправит запрос в бд
+	orphanRemoval
+		удаляет дочернюю сущность, когда связь с родителем удаляется
+	mappedBy
+		используется для двунаправленной связи(получение связанных объектов из друг друга)
+
+@JoinColumn
+	(name = "fk_name") используется для генерации столбца c внешним ключом с названием fk_name
+	ставиться на поле класса
+	есть много дополнительных параметров ForeignKey и тд
+	в один к одиному ключ добавиться в родителя
+	в один ко многим ключ добавиться в дочерней класс
+	в многие к одному ключ добавиться в дочерней класс
+
+@JoinTable
+	(name = "many_to_many_table_name) указать имя таблицы в которой будут храниться связи
+	(joinColumns = @JoinColumn(name="fk_this_class_name_id")) указать имя колонки внешнего ключа для этой таблицы
+	(inverseJoinColumns = @JoinColumn(name="fk_имя_связаной_таблицы_id")) указать имя колонки с внешним ключом связанной сущности
+
+
+
+MyBatis:
+	другой подход к организации orm фреймворка
+слой сущностей пустой, вся настройка делается через слой Repository
+
+@Select
+	("query") в параметрах пишется запрос для получения объекта
+	синтаксиси как spel, параметры в запрос берет из параметров метода
+	ставиться над методом класса
+@Insert
+	("query") пишется запрос для инсерта в таблицу
+	синтаксиси как spel, параметры в запрос берет из параметров метода
+	ставиться на метод класса
+@Update
+	("query") пишется запрос для обновления данных в таблице
+	синтаксиси как spel, параметры в запрос берет из параметров метода
+	ставиться на метод класса
+@Delete
+	("query") пишется запрос для удаления данных в таблице
+	синтаксиси как spel, параметры в запрос берет из параметров метода
+	ставиться на метод класса
+
+@Results
+	(id = "name_map") указывается название маппинга
+	(value = {@Result(...),...} тут указывается получение полей для класса
+	ставиться над методом класса
+@Result
+	(property = "object_field_name") название поля класса будет маппиться на column
+	(column = "table_column_name") указывается имя колонки из select будет маппиться на property
+	(javaType = Name_class.class) если поле объект указывается его класс
+	(one = @One(...)) указывается тип связи
+	(many = @Many(...)) указывается тип связи
+	(many = @Many(...)) указывается тип связи
+@One и @Many
+	(select = "package.class_name.method") метод для получения связи
+	(fetchtype = FetchType.) EAGER, LAZY как получать связанную сущность
+
+@ResultMap
+	("name_map") указывается маппинг с другого метода, как смапить sql и java
+	ставиться на метод класса
+
+
+
+
+Api JPA:
+JPA
+	прослойка меджу кодом и orm фреймворком, провайдер hibernate
+
+Persistence
+	информация о сохраненности объектов в базе
+
+EntityManager
+	работает с объектами согласно persistence
+	основной класс в котором происходит работа
+	создает запросы query
+	в моменте имеет только 1 entityTransaction
+EntitytTansaction
+	работает с транзакционностью объектов
+EntityManagerFactory
+	отвечает за метаданные, содержит инфу и persistence
+
+@PersistenceContext
+	работает как @Autowired, для класса EntityManager
+	в spring orm thread-safe entityManager
+	
+
+State Entity:
+	persist state - сохраненное состояние объекта
+	state - состояние текущего объекта
+	обязанность orm синхронизировать 2 этих состояния
+
+методы и их значения:
+persist() - сохранить(работает как upsert или добавление нового объекта)
+merge() - смержить state в persist state
+remove() - удалить entity
+find() - найти
+lock() - блокировка, писсимистичная, есть еще version(оптимистичная)
+refresh() - persist state в state
+detach() - отключить state от persistence context
+uptach() - подключить state в persistence context
+
+методы EntityManager:
+	find - поиск и загрузка сущности
+	persist - добавление сущности в бд
+	merge - обновление сущности в бд
+	remove - удаление сущности
+	createQuery - создание объекта запроса
+
+JPQL:
+	позволяет писать query в ооп стиле
+	использоватьс typedQuery
+	для добавления параметров setParameters которые в query :param
+	для опреаций не на чтение делать executeUpdate()
+
+test jpa:
+можно мокать entitymanager, entitytransaction, query
+	
+
+
+
+yml:
+
+spring:
+	jpa:
+		hibernate:
+			ddl-auto: create
+			позволяет указать как hibernate нужно управлять структурой базы в зависимости от метаданных сущности
+		properties:
+			hibernate:
+				format_sql: true
+					хибернейт выводит sql отформатированным
+	
+
+Spring Tx:
+Модуль для управления транзакциями
+local - транзакция в одном DataSource
+Global – транзакция в нескольких DataSource. Обычно управляются используя JTA (Java Transaction API)
+транзакции могут использоваться в jms(java message system)
+
+TransationManager
+	занимается управлением транзакциями
+	имеет много реализация для разных бд и нужд
+
+AOP propagation у транзакций будет работать только при вызове другого бина, аоп так работает
+
+Можно управлять транзакциями через TransactionTemplate(устаревший)
+
+@Transactional
+	(readOnly = boolean) true - для чтения из бд, false - по умолчанию, для прочих операций
+	(propagation = Propagation.*) для работы с вложенными транзакциями
+		REQUIRED - если транзакция 1 есть, то использует ее, или создает новую
+		REQUIRES_NEW - всегда создает новую транзакциюя, не вложенную, отдельную
+		MANDATORY - ипользует транзакцию или если ее нет транзации то бросает exception
+		NOTSUPPORTED - приостанавливает текущую транзакцию, не начинает новую
+		SUPPORTS - испльзует текущую, не открывает новую
+		NEVER - если запускается транзакция бросет исключение
+		NESTED - создает транзакцию, новую или вложеннуюу
+	(timeout) сколько времени есть на исполнение транзакции
+	(isolation) уровень изоляции для этой транзакции
+	(rollbackFor = name_checked_Exception.class) exception при котором делать откат, так как всегда если runtime то ролбек, если checked то commit
+	(noRollbackfor = name_exception.class) указать при каком exception не надо откатывать
+	используется для включения транзакции для указанного класса или метода
+	может ставиться на класс, если на классе то все публичные методы будут обернуты в транзакцию
+	может ставиться на публичный метод, транзакцией будет покрыт весь метод
+	может ставиться на интерфейс и его методы
+
+по умолчанию при работе с EntityManager открывается транзакция с readOnly=true, а
+spring-boot-starter-tx включает TransactionManager для каждой транзакции
+
+Блокировки:
+Оптимистичная блокировка
+	две опреции меняют один данные, первая операция завершилась,
+	вторая будет вынуждена перечитать изменения и смержить их
+Пессемистичная блокировка
+	одна операция блокирует ресурс,
+	вторая операция сможет с ним работать только когда первая освободит
+
+
+Spring Data JPA:
+spring-boot-starter-data-jpa, spring-boot-data-jpa и т.д.
+CrudRepository<Class, PrimaryKeyJavaClass>
+	ключевой интерфейс который содержит уже готовые методы по работе с бд
+Для Mongo:
+	MongoRepository<Class, PrimaryKeyJavaClass>
+
+PagingAndSortingRepository
+	наследник CrudRepository + пагинация и сортировка
+
+Наследники интерфейса Repository могут описывать методы для работы с бд используя ключевые слова
+
+Возможные ключевые слова:
+And
+Or
+By
+Between
+LessThen
+LessThenEqual
+GreaterThan
+After
+Before
+IsNull
+IsNotNull, NotNull
+Like
+Containing
+OrderBy
+Not
+In
+NotIn
+IgnoreCase
+
+@Repository
+	все реализации интерфейса Repository нужно пометить @Repository
+	в сущности должен быть конструктор без параметров
+
+pagingAndSorting
+	Sort.by(ASC или DESC, "column_sort1", "column_sort2" ...)
+		передается в параметры методов и возвращает отсортированные массив
+	пагинация PageRequest.of(page, count)
+		page номер страницы, начинается отсчет с 0, то есть 2 - это 3я страница
+		count это количетсво которое должно быть выведено на странице
+
+JpaRepository
+	расширение PagingAndSortingRepository
+
+У баз данных есть свои реализации Repository со своими фишками
+
+@Query
+	("query") позволяет писать запрос который будет выполнен
+		параметры можно с использованием entity.field = ?1, где 1 это первый параметр в методе
+		или с @Param("name_param_из_query") :name_param в параметрах метода
+	ставить на метод
+@Param
+	("name_param")
+	ставиться на параметры в методе
+
+можно написать свою реализацию репозитория со своими методами:
+	создается интерфейс NameRepository который наследуется от Repository(и наследников)
+		делается интерфейс NameRepositoryCustom с методом
+		делается наследник NameRepositoryImpl impl NameRepositoryCustom важны названия
+		в NameRepositoryImpl реализуется метод
+		можно добавить @Authowired NameRepository как поле
+
+
+Spring Data Jpa test:
+@DataJpaTest
+	понимает часть контекста, ответсвенную за БД.
+		И выполняет schema.sql data.sql testdata.sql. откуда брать файл указывается в resources
+		в файле application.yml
+	по умолчанию создает в начале теста и отказывает в конце транзакцию
+		можно отключить на весь класс @Transactional(propogation=NOT_SUPPORTED)
+	для работы нужен JUnit
+	включает в себя аннотацию @ExtendWith(SpringExtension.class)(не во всех старых версиях)
+	в тест @Autowired Repo и можно TestEntityManager
+
+@AutoConfigureTestDatabase
+	(replace = Replace.*) что может заменить база данных для тестов
+		ANY может заменить любую автоматически сконфигурированную
+			или определенную вручную на тестовую
+		AUTO_CONFIGURED может заменить только автоматически сконфигурированную на тестовую
+		NONE не может заменить никакую базу на тестовую
+	(connection = EmbeddedDatabaseConnection.*) указать к какой встроенной базе коннектиться
+		HSQL, DERBY, H2, NONE
+
+Какие тесты писать:
+1. read, write(уйдут поблемы с маппингом)
+2. сложные вопрос
+3. собственные реализации методов
+
+
+Базы данных:
+Key-value:
+	используется для сессий и профилей пользователей
+	кеши, индексы
+	промежуточные результаты, флаги
+представители кей валуе
+redis:
+	очень быстрый
+	есть возможность хранения на диске с асинхроной синхронизацией
+	expire для ключей
+	кластеризация и репликация
+	публикации и подписки
+	поддержка транзакций
+	типы данных: строки до 512 мб, списки, хеши, множества, упорядоченные множества
+casandra
+	для хранения временных данных
+
+столбчатые базы:
+	табица строчек
+	для хранения упорядоченных по времени данных
+	хранение больших объемов данных
+	там где требуется маштабирвоание
+	сложно редактирвать записи
+	быстрый происк и вставка
+представители:
+	hbase - хранилище для Hadoop
+
+
+документо-ориентированные:
+	структурирвоанный документ
+	записи могут иметь разную структуру
+	документы могут содержать ссылки на другие документы
+
+представители
+	Couchbase
+	CouchDB
+	MongoDB – сейчас покажу (основа MEAN-stack)
+	ElasticSearch (основная фишка – полнотекстовый поиск)
+	Informix – прям для документов
+	Solr
+	PostgreSQL
+	
+граф ориентирвоанные
+	построенты на графах, узлах и связях между ним-связей больше чем объектов
+представитель
+	neoj4
+
+
+CAP:
+базы находятся в зависимости от conststency, availbility, partition tolerance
+
+split brain
+	база данных имеет мастера, и доп ноды, если связь между мастером и доп нодой накрылась,
+		то доп нода становиться мастером, и может получиться 2 мастер и расхождение данных
+		есть разные решения этой проблемы. одна из них сервисы голосавания кто мастер
+		если сервисы отвалились то только чтение
+
+
+Spring Data Key-Value
+дефолтная релизация на ConcurrentHashMap
+
+@EnableMapRepositories
+	(mapType = название_реализация.class) можно указать на какую реализация заменить дефолтную
+	включает работы с key-value db
+
+@KeySpace
+	("name_entity")
+	ставить на сущность по аналогии @Entity
+
+@Id
+	указывает какое поле класса будет key, value - entity
+	ставить на поле класса с @KeySpace
+
+@Repository
+	такая же как для обычной базы
+	наследование такое же
+
+KeyValueTemplate
+	содержит методы crud, можно создать KeyValueQuery и работаь через него
+	автоматически создается, но можно переопределить вручную
+	создается через KeyValueOperations(new KeyValueTemplate(keyValueAdapter())),
+		 а KeyValueAdapter(MapKeyValueAdapter(название_класса_реализации.class))
+
+Spring Data Mongo:
+хранит в формате bson
+поддерживает связи с другими доккументами, embeded или по ссылке
+для М то М
+	вложенные: если много чтения, а не записи
+	повторение данных не проблема, изменение на одной строне чаще
+	ссылаться: если много связаных сущностей, изменения часто в обеих сущностях
+	или смешанных подход для производительности
+
+spring:
+	data:
+		mongodb:
+			authentication-database: admin
+			username: root
+			password: root
+			database: user_db
+			port: 27017
+			host: localhost
+
+@EnableMongoRepositories
+	настраевает бины для работы с монгой
+	c embedded не нужно ставить
+
+@Document
+	аналог @Entity для сущностей при работе с mongo
+@Id
+	указать уникальный ключ
+@Field
+	поле, аналоог @Column
+@DbRef
+	ссылка для объекта, аналог связей
+@Transient
+	если не хотим сохранять поле
+
+@Query
+	работает с синтаксисом монги
+
+MongoTemplate
+	содержит огромное количество методов которых нет в repository
+	позволяет писать запросы через Query
+	в spring boot автоматически, но можно и сконфигурирвать руками
+		создается через Mongo(new MongoClient()), а new MongoTemplate(mongo())
+
+Каскадные операции в монго:
+	нужно отнаследоваться от AbstractMongoEventListener и реализовать метод onBeforeConvert
+	и заложить логику, по классу
+
+Есть embeded-mongo
+	de.flapdoodle.embed.mongo
+	можно использовать для тестов
+
+Mongock:
+	flyway для mongo только описывается в java
+	com.github.cloudyrock.mongock.mongock-spring-v5 и драйвер com.github.cloudyrock.mongock.mongodb-springdata-v3-driver
+
+@EnableMongock
+	включает работу с mongock в spring boot приложении
+
+@ChangeLog
+	ставить на классе который будет содержать changeset
+
+@ChangeSet
+	(order = "***") *** это номер выполнения, например 001, 002
+	(id = "название_операции") указвается название выполяемой операции
+	(author = "кто написал метод")
+	(runAlways = boolean) true, запускаться всегда
+	ставить на методы класса
+	в параметры метода можно передать параметры, MongoDatabase, entity_nameRepository
+
+mongock:
+	runner-type: "ApplicationRunner" # default
+	#runner-type: "InitializingBean"
+	change-logs-scan-package:
+	- package.mongock.changelog где искать changelog(классы java)
+	
+
+Spring MVC:
+spring-boot-starter-web или spring mvc
+http
+	строится на запрос-ответ
+	GET, POST(не идемпотентный), PUT, PATCH, DELETE, HEAD,
+		OPTIONS(какие запросы доступны по адресу), TRACE(отключен из  безопасности)
+http-code
+	1xx - информационные
+	2xx - все ок
+	3хх - редирект
+	4хх - ошибка, клиент виноват
+	5хх - ошибка, сервер виноват
+
+
+web-сокет
+	строится на запрос-ответ
+
+
+идемпотентность
+	сколько бы раз не применили операцию, результат один и тот же относительно первой и следующих
+		получение сущности выполняет на сервере одни и те же операции
+		метод сохранения меняет состояние сервера
+
+MVC
+	model динамические данные приложения
+	view представление информации
+	controller канал для общения
+
+WebApplicationContext
+	расширение ApplicationContext с возможностями для web приложений
+	его наследники это XmlWebApplCont, AnnotConfWebApplCont, GroovyWebApplCont, XmlPortletApplCont
+	request, session, global session от него
+
+
+Servlet
+	интерфейс который связывает сервер приложения и spring web
+
+
+@EnableWebMvc
+	включает конфигурацию spring mvc
+	не нужна со spring boot
+	добавляет в приложение embedded server container
+
+@ServletComponentScan
+	ищет классы помеченные @WebServlet @WebFilter @WebListener
+@WebServlet 
+	помечаются классы сервлетов
+	можно создать сервлет и через @Bean
+@WebFilter
+	помечаются классы фильтров
+	можно создать фильтр и через @Bean
+@WebListener
+	помечаются классы листенеров
+	можно создать листенер и через @Bean
+
+WebMvcConfugurerAdapter
+	дополнительный класс для конфигурации mvc приложения
+
+EmbeddedServletContainerCustomizer
+	для настройки embedded server container
+
+
+@RestController
+	работает как @Controller и к каждому методу @ReponseBody
+	ставить на класс
+	возвращает данные в формате(json, xml, text...) указанном для метода или контроллера
+	
+@ResponseBody
+	обрабатывает ответ из java в указанных формат для клиента
+
+@RequestMapping
+	("/url") позволяет указать url путь для класса или метода
+	(method = RequestMethod.*) указывается тип операции, применим к методам
+	(value = {"/url1", "url2"}) можно указать несколько маппингов url
+	(method = {RequestMethod.Get, RequestMethod.Post}) указать несколько операций
+	ставиться на класс или метод(url_class + url_method)
+
+@GetMapping, @PostMapping, @PutMapping, @PatchMapping, @DeleteMapping
+	аннотации работают как @RequestMapping, но уже с заданным method запроса
+	со Spring 4.3
+
+@PathVariable
+	(value = "path_param_name") указать название параметра в url
+	(required = boolean) является ли обязательным, по умолчани true
+	получает данные из пути url /{name_param}
+	ставиться на параметры метода
+@MatrixVariable
+	получить множественные параметры из пути запроса
+
+@RequestParam
+	(value = "name_value") указывается ключ, для которого будет получено значение
+	(required = boolean) является ли параметр обязательным
+	(defaultValue = "value") можно указать значение пол умолчанию если не пришел параметр
+	получает данные(key=value) из параметров запроса после /url?
+		или достает их из body
+	ставиться на параметры метода
+Большое количество параметров после ? можно получить в объект Java, Spring сам сопоставит поля и
+	название праметров, объект просто передать в параметры метода
+
+@RequestBody
+	позволяет получить тело запроса в java объекте в парамтры метода
+	ставиться на параметры метода
+
+@RequestHeader
+	позволяет получить header в параметры метода
+	ставиться на параметры метода
+
+ResponseEntity
+	билдер для настройки ответа
+
+@ExceptionHandler
+	(class_name.class)
+	ставиться на метод и в параметры можно получить clas_name
+	перехватывает exception по типу из параметров в классе где создан
+
+@ControllerAdvice
+	ставиться на класс с обработкой ошибок,
+		перехватывает все exception с контроллеров для обработки,
+		класс содержит @ExceptionHandler-ы с методами
+
+Класическое приложение Spring MVC View:
+Spring Mvc работает с :
+jsp(с ограничениями и плясками), thymeleaf, groovy markup templates, freemarker, velocity(old)
+
+Работает через @Controller
+	из методов возвращается "название_формы_ответа"
+	параметры метода принимается Model(маппа с обектами для заполнения формы клиенту)
+
+thymeleaf:
+spring-boot-starter-thymeleaf
+	подключает в спринг бут
+	можно использовать spring spel для заполенения ответа клиенту
+	работает со сложными объектами в Model
+	в resources должна быть папка /templates которая содержит в себе html
+		в /static и /public картирки и css
+	можно во вью работать с бинами, но лучше в model
+
+xmlns:th="http://www.thymeleaf.org">
+	для подключения в html файл
+
+th:*=""
+	используется в тегах для получения значений из Model
+	в "" пишется spel
+	теги * (просто дублировать тег который в html):
+	object в параметры "${название_объекта_в_моделе) задает для вложенных тегов доступ
+		к полям объекта кратко *{поле_объекта} вместе ${название_объекта.поле_объекта}
+	text
+		используется для вывода данных через spel
+		вместе с object позволяет получить *{поле_объекта} кратко
+	href
+		позволяет корректирвовать url для страницы во время работы приложения
+			то есть задать параметры запроса ? "@{/url(key=${value}, key2...)}"
+			рестовый подход "@{/delete/__${id}__}"
+	th:action
+		для action формы
+	th:value
+		значение input
+	th:each
+		foreach
+	th:if
+		блок создается если условие истино
+
+Локализация:
+th:text=""
+	"#{key_in_prop}" или "#{key_in_prop('Params')}"(key=Hello, {0})
+	можно так же через th:utext
+	
+локализация:
+LocaleResolver
+	создается как бин что бы определить какая локаль у пользователя
+		AcceptHeaderLocaleResol ver (на основании заголовка "Accept-Language")
+		CookieLocaleResolver (текущая локаль сохраняется в cookie)
+		SessionLocaleResolver (текущая локаль сохраняется в сессии)
+	Spring Boot сконфигурирует сам
+
+LocaleChangeInterceptor
+	позволяет пользователю менять локаль через переходы по ссылкам:
+	должен добавляться в конфигурацию сервлета
+	Spring Boot сконфигурирует сам
+
+
+
+Test spring mvc view:
+@WebMvcTest
+	(Name_class_controller.class) замокает этот контроллер
+	@Authowired MockMvc и далее работа с @MockBean и тд
+	mvc.perform().andExpect() и тд
+
+
+
+Современные Spring Mvc приложения:
+где требуется scope session:
+	создается jsessionId, который передается клиенту, хранится как map
+		jsession хранится на уровне веб сервера, spring поддерживает реализацию
+		по умолчанию удаляется через 30 минут после последнего обращения
+	испльзуется для настроек пользователя, security, формы, cross-page
+
+session scope
+	для работы нужен прокси, конфигурируется через @Scope
+	в параметры методов работающих с session scope можно получить HttpSession
+
+
+Spring Web Flow:
+используется для работы с сессионностью на разных страницах и 
+	позволяет хранить данные между страницами
+работает через xml
+
+
+
+Классические приложения:
+	html c данными для каждой страницы, генерируется сервером
+	js подключается в html, анимирует html с данными
+	css подключается в html, задает стиль отображения
+	можно получить документ /get.html
+
+AJAX(asyncronous JavaS cript and xml):
+	небольшая статическая html с кодом js, который загрузит данные с сервера
+		допольнительным запросом в формате json
+	работает через html к которому подключется js и css
+	есть ресты для получения формы html
+		и есть ресты для получения json
+		они могут быть на разных серверах и разных языках
+
+SPA(single page application):
+	html и в нем в основном js, приходит с nginx, js управляет всем визульным
+	формально вы остаетесь на одной html странице 
+	все остальное наполнение через обычный запрос на сервер
+	нет запросов клиента для получения форм
+
+Реактивное программирование:
+реактивное программирование
+	мы реагируем на какое то событие, мы не ждем пока нам ответят
+	ориентированно на сообщения (message Driven) и из этого исходит что оно будет:
+		эластичным(elastic, отвечать нагрузке)
+		устойчивым(resilint, восстанавливаться после нагрузки)
+		реагирующем(responsive, отвечать на запросы в какое либо ограниченное время)
+	это call-back написанный хорошим способом
+	все реактивное программирование ленивое, если не подписаться, то не будет выполнения
+
+ReactiveX
+	стадарт как надо писать на реактивном программирование
+
+JavaRx
+Message
+	сообщения, данных которые куда отправляем. не работаем напрямую(заказ)
+Observer
+	наблюдатель, тот кто наблюдает за статусом события(человек)
+Observable или Flowable(rx 2)
+	что то что может показывать статус события, то за чем можно наблюдать(экран с номером)
+	горячий является над внешним источником данных
+	холодный данные создаются внутри(выполнение не происходит пока не подпишемся)
+		observable - для небольших объемов данных, где не будет блокировок
+		flowable - для больших данных, и где есть блокировки в работе и случиться backpressure
+Subscription
+	подписка на событие, когда следишь за событием, то это подписка на событие(человек смотрит)
+Subscriber
+	observer + subscription. подпичсик который сам управляет своей подпиской
+Subject
+	observer + observable. наблюдает за событием и за ним можно наблюдать
+
+
+backpressure
+	если забытий генерируется больше чем обрабатывается, есть способы задать обработку
+
+
+
+Reactive Spring Stack:
+Netty(Tomcat с донастройкой + servlet api 3.1), Project Reactor, Spring Data Reactive Repositories,
+Spring WebFlux, Spring Reactive Security
+
+Spring WebFlux:
+	аналог spring mvc, но реактивный
+
+Single
+	для возврата единичного значения в реактивном формате
+Flowable
+	для возврата множества в реактивном формате
+
+Project Reactor аналог RxJava(Spring поддержа из коробки):
+	mono - реактивный optional(single + packpressure усточивость)
+	flux - множества в реактивном формате(с поддержкой packpressure)
+
+produces = MediaType.TEXT_EVENT_STREAM_VALUE
+	если использовать этот тип то будет открыт что то вроде веб сокет
+	он значить что не надо закрывать соединения, данные будут досылаться
+
+	
+Reactive-repository-mongo:
+@EnableReactiveMongoRepository
+	реакливность для монго
+
+для создания репозиториев
+	extends ReactiveMongoRepository<?,?>
+
+
+Transaction
+	работает через @Transaction так же как и в не реактивном
+	или через template.inTransaction().execute()
+
+
+
+
+Spring Web Flux:
+
+как работает
+	приодит запрос, выполняется метод, из него возвращается поток, Spring WebFlux подписывается
+		на этот поток и поток начинает выполняться, когда поток выполниться 
+		тогда сформируется ответ клиенту и будет отправлен
+
+
+@EnableWebFlux
+	настраевает бины для реаклтивного программирования
+
+Reactive-streams
+	Mono<Person> - поток из 0..1 пёрсонов
+	Flux<Person> - поток из 0..n пёрсонов
+RxJava v1
+	Single<Person> - поток из 0..1 пёрсонов
+	Observable<Person> - поток из 0..n пёрсонов
+RxJava v2
+	Single<Person> - поток из 0..1 пёрсонов
+	Flowable<Person> - поток из 0..n пёрсонов
+
+Flux<ServerSentEvent>
+	web socket тип
+
+
+Functional Endpoints(route)
+	создается через @Bean, возвращаемое значение RouterFunction<ServerResponse>
+		создание объекта route().*(GET("url_name", accept(), request -> обработка запроса,
+		и тд), POST и тд)
+
+
+Reactive Test:
+reactor-test
+	библиотека для тестов
+
+Repository:
+StepVerifier  класс для проверки реактивных объектов
+	StepVerifier.create(reactive_object).assert...
+
+Controller-test:
+WebTestClient
+	по аналогии с WebMvc
+
+
+
+
+Spring Security:
+в web работает через servlet filter, фильтры объединены в цепочки
+цели:
+аутентификация
+	что пользователь тот за кого себя выдает(кто ты?)
+авторизация
+	предоставление прав доступа к объекту(что ты можешь?)
+
+spring security может
+	подтверждение подлинности
+	предоставление/запрещение доступа
+	храненить права доступа
+	проверять права доступа
+
+Механизмы аутентификации в spring security
+	http basic, http digest, http x.509, form-based, openId, LDAP, jdbc или in memory,
+		active directory, своя реализация
+
+Механизмы авторизации
+	по url
+	по методам сервисов
+	по объектам
+
+не может 
+	защитить от sql injection, xss и прочего
+	не шифрует и не обфусцирует поток
+
+Основные компоненты:
+
+SecurityContext
+	хранилище для Authentication
+
+SecurityContextHolder
+	позволяет получить SecurityContext для текущей сессии
+	можно настроить формат работы через MODE_*
+		THREADLOCAL(по потоку), INHERITABLETHEADLOCAL(дерево), GLOBAL(во всем приложении)
+
+Authentication
+	хранит данные о аутентификации и авторизации и текущем пользователе
+	Authorities
+		это права которые зарегистрированы
+		GrantedAuthority
+			список текущих запрещений или разрешений
+	Credentials
+		секрет которым пользователь подствержает что это он(пароль)
+	Details
+		общая информация о пользователе
+	Principal
+		идентификатор пользователя(логин)
+
+UserDetails
+	содержит данные пользователя из хранилища приложения, и его состояние
+	authorities, username, password, accountNonExpired(истек ли срок действия),
+	accountNonLocked(заблокирован ли), credentialsNonExpired(протух ли пароль), enabled(включен ли)
+
+UserDetailsSerive
+	загружает userDetailsService
+	необходимо явно создать как бин, и возвращать выбранную реализацию
+
+
+Фильтры в Spring Security по порядку вызова:
+
+ChannelProcessingFilter
+	управляет каналом передачи запроса. Если хочется только https, то не https развернет он
+		редирект или что то еще
+
+ConcurrentSessionFilter
+	работа с сессиями пользователя
+
+SecurityContextPersistenceFilter
+	создает и сохраняет контекст безопасности
+
+Фильтр(ы) аутетификации
+	первичная аутентификация
+
+RememberMeAuthenticationFilter
+	вторичная аутентификация
+
+AnonymousAthenticationFilter
+	вторичная аутентификация
+
+ExceptionTranslationFilter
+	обработка данных с предыдущих шагов, принятие решения переходить ли к авторизации
+
+FilterSecurityInterceptor
+	работа с авторизацией
+
+
+путь HttpRequest со Spring Security:
+реализации будут зависеть от выбраного типа аутентификации
+-> вызывает
+httpRequest ->
+BasicAuthenticationFilter ->
+AuthenticationManager(выполняет аутентификацию, создает фейк реализацию Authentication)-> 
+ProviderManager ->
+AuthenticationProvider(конкретная реализация аутенификации) ->
+UserDetailsService(получает UserDetails) -> 
+AuthenticationProvider(проверяет пароль на совпадение(через сравнение закодированных),
+	задает реальный Authentication) ->
+BasicAuthenticationFilter(если authenticated false, то ошибка)(если true то пишем в) -> 
+SecurityContextHolder
+
+
+PasswordEncoder
+	функция кодирования пароля
+	создается как бин
+	к функциям хеширования небходимо добавлять солья
+
+AbstractSecurityInterceptor
+	занимает авторизацией
+
+AcessDesicionManager
+	примает решение о доступе к функционалу приложения, обработка доступов у авторизации
+
+FilterSecurityInterceptor
+	Управляет доступом на уровне URL
+	Использует цепочку HTTP фильтров для управления доступом
+
+MethodSecurityInterceptor
+	Управляет доступом на уровне методов класса
+	Использует Spring AOP
+
+
+@EnableWebSecurity
+	включает создание и конфигурацию бинов
+
+
+spring security web:
+работает через servlet filter
+
+DelegatingFilterProxy
+	передает вызов в цепочку фильтров security
+
+WebSecurityConfigurerAdapter
+	настраевает цепочку фильтров
+	порядок фильтров в цепочке можно сконфигурировать(очень осторожно)
+	configure(WebSecurity) какие пути мы игнорируем для security
+	configure(HttpSecurity) настраевает фильтры для security
+
+
+Работа в конфигурационном классе:
+.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.*)
+	указывается какое состояние должно быть у SecurityContext,
+		по умолчанию SecurityContext хранится в сессии
+	ALWAYS всегда создает httpSession
+	NEVER не создает httpSession, но использует если она есть
+	IF_REQUIRED создаст httpSession если это необходимо
+	STATELESS никогда не создаст httpSession и не будет ее использовать
+
+
+Form-based:
+нужно использовать только в https
+.formLogin()
+	включит аутентификацию form-based
+
+.loginProcessingUrl("url")
+	настраевается url для аутентификации
+.usernameParameter("")
+	настроевается название параметра username в запросе который мы ожидаем
+.passwordParameter("")
+	настроевается название параметра password в запросе который мы ожидаем
+.loginPage("url")
+	настраевается сраница или url для аутентификации. ("/login.html")
+.defaultSuccessUrl("url")
+	куда перенапрявлять в случае успеха, если нет изначальной запрашиваемой страницы
+.successForwardUrl("url")
+	всегда перенаправлять в случае успешной авторизации
+	не понятно как работает
+.failureForwardUrl("url")
+	куда перенаправлять в случае ошибки
+
+.and().logout("url")
+	настраевается url для разлогина
+
+
+JSESSION
+	сессионный ключ, который создаёт сервлет контейнер для хранения сесси
+	хранится как ключ значение
+	security context связывает разные запросы по jsession, что бы не пересоздаваться
+
+
+
+
+Http-basic:
+login, password передаются в поле загаловка Authorization в закодированном виде,
+	отправляется в каждом запросе
+Используется без сессионности на сервере
+нужно использовать только в https
+уязвим для in the midle
+
+.httpBasic()
+	включить аутентификациюю http-basic, других настроек нет
+
+
+Anonumous Authentication:
+вторичная аутентификация
+запускается после первичной аутентификации
+есть доступные ресурсы, по ним нужно иметь заполенный контекст, для этого анонимная аутентификация,
+	которая заполяет контекст. Аноним с самыми дохлыми правами
+
+.anonumous()
+	включить анонимную аутенификацию
+.authorities()
+	назначить права анонимному пользователю
+.principal()
+	назначить имя анонимному пользователю
+	или можно передать класс анонимного пользователя
+
+Remember-me-authentication:
+	позволяет сохранять информацию о пользователями между http сессиями
+	обычно через cookie в браузере
+	работает только с form-based auth
+
+работает на:
+подход simple hash-based token
+	(username + ":" + expirationTime(соль) + ":" + 
+		md5Hex( username + ":" + expirationTime + ":" + password + ":" + key))
+	jwt токен реализация подхода
+	можно поменять key и все сесии разлогинит
+	токены храняться в хранилище, досупны по суррогатным ключам(значения из cookie)
+или
+подход persistent Token 
+
+form-based + 
+.rememberMe()
+	включить запоминание между сессионное
+.key("key")
+	указать ключ к token
+.tokenValiditySeconds(time)
+	время жизни токена
+
+тестирование с ролями:
+spring security test
+@WithMockUser
+	(username = "name") указывается имя пользователся с которым будет запущен тест
+	(authorities = {"role"}) указываются права пользователя с которыми будет запущен тест
+
+
+Авторизация:
+acl
+	доступ на основе бизнес сущностей
+
+ролевая модель
+	представляют из себя строчки, обычно сравнивается через equals
+	набор ролей это GrantedAuthority(можно и сделать свой сложный объект)
+	обычно права пользователя после аутентификации сохраняются в кеш из которого 
+		потом читаются для выдачи доступов
+	называются ROLE_ADMIN, ROLE_ANONYMOUS, ROLE_USER, в каких то классах 
+		записываются ADMIN, USER и ROLE_ добавиться автоматически
+		hasRole("ADMIN"), hasAuthority("ROLE_ADMIN")
+	ролевая модель по умолчанию плоская, но можно сделать иерархичную
+		@Bean RoleHierarchyImpl
+	
+AcessDecisionManager
+	осуществляет проверку прав, опирается на GrantedAuthoritys
+	наследники AcessDecisionManager
+		AffirmativeBased
+			если один сказал да, то доступ есть. По умолчанию
+		ConsensusBased
+			каких голосов больше то такой доступ и будет.
+		UnanimousBased
+			если один сказал нет, то запрещаем доступ
+	наследники будут опрашивать Voter классы что бы принять решение
+
+AcessDecisionVoter	
+	класс который проверяет наличие необходимой роли у пользовтеля
+	можно написать своб реализацию
+
+
+для настройки security config важен порядок следования, сверху вниз, от конкретных
+	к более общим паттернам, иначе не будет работать как задумано
+
+.authorizeRequests()
+	ставить перед настройкой antMathchers()
+
+.antMatchers
+	("url")
+	указывается url, или паттерн для которого необходимо выполнить действие авторизации
+		паттерн пишется через *, одна * означает обязательно один уровень вложенности
+		две ** обязательно один или более уровней вложенности
+
+.anonymous()
+	дать доступ к ресурсу тем у кого есть анонимная роль
+
+.authenticated()
+	дать доступ тем кто прошел аутентификацию
+
+.hasAnyRole("role1", "role2"...)
+	дать доступ тем кто имеет одну из ролей
+
+.hasAuthority("ROLE_*")
+	дать доступ тому что имеет роль
+
+.denyAll()
+	все что по паттерну явно не разрешено запрещено
+
+Авторизация на основе вызовов методов:
+эта авторизация не до spring web, она основана на AOP
+
+@EnableGlobalMethodSecurity
+	(securedEnabled = true) включить работу с аннотациями  @Secured
+	(prePostEnabled = true) включить работу с аннотациями @PreAuthorize, @PostAuthorize,
+		@PreFilter, @PostFilter
+	настраевает бины для работы, ставить на конфигурационный класс
+
+MethodSecurityInterceptor
+	основной бин для работы
+
+
+@Secured
+	("") можно передать необходимую роль(ROLE_*) для доступа
+	ставить на метод, класс
+	работает через прокси над сервлетом после авторизации
+	нет поддержки SpeL выражений
+	в некоторых ситуациях лучше не использовать с ролями, и записать это в SecurityConfig
+
+@PreAuthorize
+	("spel") указывается выражение с необходимыми правами доступа
+		hasPermission(#objectParamMethod, 'READ') есть ли у пользователся из securityContext
+			право чтения этого объекта, если нет то ошибка доступа
+		hasRole('ROLE_*') если имеет указаную роль то получит доступ к методу
+	если нет необходимых прав то кидается AcessDeniedException
+	позволяет определить права для вызова метода
+	работает со SpeL выражениями
+
+@PreFilter
+	(value = "spel")
+		hasPermission(filterObject, 'READ') объект в параметрах метода будет отфильтрован и
+			только те объекты в коллекции которые у данного пользователся c READ
+			будут переданы в метод, как новый список
+	(filterTarget = "nameObjectParamMethod") указывается название параметра для фильтрации
+	выполняет фильтрацию коллекции в параметрах метода по правам доступа
+
+@PostAuthorize
+	("spel")
+		hasPermission(returnObject, 'WRITE') у возвращаемого значения проверить право на запись
+		для ссылки на возвращаемое значение используется returnObject
+	работает с возращенным объектом из метода и проверяет права на его использование
+
+@PostFilter
+	("spel")
+	hasPermission(filterObject, 'READ') отфильтровать и оставить только те что с правом чтения
+	выполняет фильтрацию выходных значений
+
+
+Spring securty acl:
+ACL acess contol list:
+	концепт предоставления доступа
+	для работы с acl spring security создает в базе допольнительный таблицы для хранения прав
+	и объектов: acl_object_identity(инфорамция о всех сущностях в системе),
+		acl_class(идентифицирует сущность),
+		alc_sid(идентифицирует тип владельца), acl_entry(права владельца к сущностям системы)
+	возможность чтения acl для всех сущностей
+	оптимизированный механиз чтения
+	использование кеширования
+	возможность проверки перед вызовом и после вызова
+	
+
+
+Permission
+	spring security использует битовые маски для обозначения прав доступа
+		0 read, 1 writr, 2 create, 3 delete, 4 administer
+
+Ключевые классы:
+Acl
+	список управленя доступок который определеяет кто или что может получать доступ к объекту
+MutableAcl
+	реализация в которой можно модифицировать acl
+AccessControlEntry
+	содержит объект с разрешением
+Permission
+	разрешение
+Sid
+	идентифицирует учётную запись пользователя, интерфейс с equals и hashCode методами
+ObjectIdentity
+	предоставляет уникальную идентификацию сущности
+AclService
+	вся логика заложена тут
+MutableAclService
+	что бы работатьь с измененой acl
+AclCache
+	кеш
+
+Spring Security Reactive:
+
+@EnableReactiveWebSecurity
+	конфигурация и подключение бинов security для реактивности
+
+
+
+Spring Batch:
+	содержит абстракции для пакетной обработки данных
+
+etl extract transform load
+	извлечение, преобразование, загрузка
+	из источнков к общему виду в другие источники
+
+
+job
+	абстракция работы, содержит описание шагов из которых состоит обработка
+step
+	шаг работы
+	может быть чтение данных из источника, преобразование, отправка
+item
+	элемент обработки
+	строчка в бд, объект и т.д.
+chunk
+	пачка элементов который будут обработаны за раз
+
+tacklet
+	единичное действие на выполнения, где не нужны трансформация
+
+
+Job:
+создается через @Bean Job
+для создания есть builder
+
+JobBuilderFactory
+	фабрика для создания билдеров job
+	ее нужно сделать @Autowired
+.get
+	("name_builder_job") получить у фабрики билдер с названием name_builder_job
+
+.start
+	(object) передается объект для выполнения
+		step - для последовательной обаботки
+		flow - для паралельной обработки
+
+.next
+	(object) следущий объект для выполнения
+
+.end
+	закончить
+
+.listener
+	(object) задается объект методы которого будут выполняться в результате выполнения стадий job
+		ItemReaderListener(beforeRead, afterRead, onReadError) для чтения
+		ItemWriterListener(beforeWrite, afterWrite, onWriteError) для записи
+		ItemProcessListener(beforeProcess, afterProcess, onProcessError) для записи
+		ChunkListener(beforeChunk, afterChunk, onChunkError) для chunk
+
+.taskExecuter
+	(object) можно передать выполнятель для паралельной работы task
+
+.build
+	собрать job
+
+
+Step:
+создается как @Bean Step
+для создания есть builder
+
+ItemReader
+	специальный интерфейс для чтения item
+	есть множество готовых реализаций
+ItemProcessor
+	принимает item, но возвращает уже другой(может и тот же), работает согласно логике
+	пишем сами
+ItemWiter
+	записывет item куда то
+	есть множество готовых реализаций
+	обычно все предыдущие операции оптимизируют для записи, она сама затратная
+
+stepBuilderFactory
+	фабрика для создания билдеров для step
+	ее нужно сделать @Autowired
+
+.get
+	("step_builder_name") получить от фабрики билдер с таким названием
+.chunk
+	(number) размер пачки которая будет передана на запись в хранилище
+
+.reader
+	(ItemReader) назначается объект для чтения
+
+.processor
+	(ItemProcessor) назначается объект для обработки
+.writer
+	(ItemWiter) назначается объект для записи
+.build
+	() создать step
+
+
+JobInstance
+	конкретный экзепляр job
+JobExecution
+	процесс выполнения job
+	создается для каждого JobInstance, у одного JobInstance может быть несколько JobExecution
+
+StepExecution
+	процесс выполнения step
+	создается для каждого JobExecution, у одного JobExecution может быть несколько StepExecution
+
+
+JobRepository
+	репозиторий для взаимодействия с хранилищем всех Job, execution и всех остальных сущностей
+
+SimpleJobRepository
+	его простая реализация
+	Но может использовать непростые DAO для хранения Job-ов
+
+
+JobRegistry
+	позволяет динамически работать с Job
+	зарегестрировать, удалять, получить список всех job, или о имени и т.д.
+	он уже есть как бин в приложении
+
+MapJobRegistry
+	реализация JobRegistry
+
+JobRegistryBeanPostProcessor
+	если его объявить как @Bean то он автоматически зарегистрирует все @Job
+
+Запуск job:
+spring.batch.job.enabled: true 
+	запустит все job при старте приложения, поведение по умолчанию
+
+CommandLineJobRunner
+	запуск через jar с параметрами с помощью
+	сложно и в целом не очень логично
+
+JobLauncher
+	можно передать job(который создан как @Bean) и параметры и она будет запущена
+	регистрирует в jobRegistry сам
+	умеет только запускать
+
+JobOperator
+	принимает на вход имя job и запускает
+	работает только с зарегистрированными в JobRegistry
+	умеет много всего
+
+JobExplorer
+	можно узнать инфо о job, только чтение
+
+@StepScope
+	позволяет задать параметры на выполнения контреного шага, будут пересоздаваться
+	работает вместе с @Value
+
+
+@EnableBatchProcessing
+	нужна только когда нет spring boot
+	конфигурирует бины для работы с batch
+
+
+Тестирование Spring Batch Test:
+@SpringBatchTest
+	работает вместе со @SpringBootTest
+	добавляет в тесты JobRepositoryTestUtils, JobLauncherTestUtils,  StepScopeTestUtils
+	добавляет для работы AssertFile для сравенения полученого результат с ожидаемым в файле
+	
+JobLauncherTestUtils
+	содержит всего 1 job и отдает ее
+
+JobRepositoryTestUtils
+	обычно требуется очистка этого класса в контексе, делает через @BeforeEach 
+		jobRepositoryTestUtils.removeJobExecution()
+
+
+
+Монолит против микросервиса:
+Монолит
+	одно приложение
+	включает все бизнес кейсы
++
+	простые инеграции
+	все в 1 месте
+	легко работать с транзационностью
+-
+	падае сразу все
+	может стать большим комом грязи
+	сложно поддерживать
+
+Микросервисы
+	каждая бизнес функция это отдельный сервис
+	простые коммуникации
+	децентрализованное управление
+	атоматизированная инфраструктура
+
++
+	ествественное разделение сервисов
+	сервисы на разных технологиях
+	просто заменить сервис
+	изолорованные сбои
+	горизонтальная маштабируемость
+-
+	трудности в интеграции
+	сложно правильно сделать, и не получить распределенные монолит
+	больше затрат на начально этапе
+	меньшя надежность
+
+
+Интеграции
+стратегии
+	shared file system
+		+ нет зависимости от отправителя и получателя, безопасность
+		- низкая производительность и стойкость, зависимость от файловой системы, транзакционности нет
+
+	database
+		+ транзации
+		- зависимость от бд, блокировки, маштабируемость, интернет лаги
+
+	rest/soap
+		+ независим от технологии, популярное, простота в использование
+		- отправитель и получатель связаны, синхронность взаимодейсвия, доставка сообщения(гарантирована по идее)
+
+	messaging
+		+ независимость получателя и отправителя, асинхронность, маштабируемость, 
+			гарантированная доставка, простота преобразования
+		- время обработки и доставки не фиксированное
+
+Messaging
+	у монолита уменьшает связанность
+
+Связанность(coupling)
+	степень независимости модулей
+	чем она меньше тем лучше
+	делать в системе минимальное необходимое количество, тогда легко меняется и тестируется
+	связанность: содежимого(один модуль зависит от особенностей другого, изменения везде),
+		через общее(два модуля работают с 1 данными, изменения везде)
+		через внешнее(два модуля завязаны на формате из вне, изменения везде)
+		по управлению(один управляет поведением другого, изменения везде)
+		по струкрурированным данным(используют общую структуру, но каждый свою часть, изменения везде)
+		через данные(общие данные через параметры, элементарные данные) +
+		по сообщениям(передача сообщений)+
+		отсутсвие связнности(никак не взаимодействуют)+
+
+
+Связность(cohesion)
+	целостность модуля, насколько он прост
+	чем больлше она тем лучше
+	Объект обладает высокой связностью если его обязанности хорошо согласованы 
+		и он не выполяет огрмных объемов работ
+	типы: случайная(объединяет модуль, нет групировки)
+		логическая(модули логичеки решают одну проблему)
+		временная(части модуля изпользуются в одно время)
+		процедурная(части модуля всегда используются в определенном порядке)
+		по взаимодействию(части модуля работают над одними и теми же данными)
+		по последовательности действий(результат одной части, исодные данные для другой)
+		функциональная(направлены на решение одной задачи, за которую отвечает модуль)
+
+Парадигма EIP:
+	Message
+		объект который содержит payload
+
+	pipe
+		соединение фильтров
+
+	filter
+		независимый узел обработки сообщения
+		получает сообщение из pipe и отправляет в pipe
+
+	endpoint
+		соединения pipe и filter
+
+аналогия:
+pipes-and filters:	eip/Spring-Integration:
+message			message
+filter			endpoint
+pipe			channel
+
+IntegrationFlow 
+	класс который позволяет создавать цепочку событий в который описываются
+		необходимые интеграции: flow.handle("name_service", "name_method").handle(...)
+	создается как @Bean
+
+
+
+Spring Integration:
+	реализация messaging патернов и спринг окружения
+	spring boot stater integration
+	работает с монолитами, что бы упростить ассинхронное взаимодействие внутри него
+
+Базируется на: (ради чего стоит делать)
+	минимальная связанность(lose coupling) для простой модульности и тестирования
+	четко разделяется бизнес логика и логика интеграции
+	асинхронная обработка
+
+SEDA(stage event driven application)
+	событие которое идет по стадиям и обрабатывается
+	в случае spring integration события выполняются на одной машине
+	kafka, mq, между сервисами
+	Apache Storm(фреймфорк)
+		способ ассинронной обработки
+		позволяет работать с разными кластерами в рамках SEDA
+
+Парадигма Spring Integration:
+	Message
+		сообщение, то что перемещается по каналу между эндпойнтами
+		объект который содержит payload
+		соответсвует одноименному паттерну
+
+	channel
+		то что соединяет endpoit между собой
+		то по чему отправляется сообщение
+		только для обмена, сам ничего не делает
+
+	endpoint
+		то что принимает информацию и отправляет ее
+		то что соединяется каналами
+		независимый узел обработки сообщения
+		получает сообщение из channel и отправляет в channel
+		их огромное множество и они выполняют разные задачи: 
+			перенаправление, обработка, сбор и тд.
+
+Классы:
+Message
+	содержит в себе payload(данные) и messageHeaders(адреса кому и инструкци по обработке)
+		headers
+			неизменяемые, считается что лучше не менять, делать копию например
+	два типа паттернов сообщений: command - действия и данные для действия, 
+		document - только данные
+	создается через builder, сам заполняет обязательные поля по умолчанию
+
+MessageHeader
+	хранит в себе map с headers и обязательные параметры
+	обязательные поля MessageHeaders: id, timestamp, reply_channel, error_channel
+
+MessageChannel
+	сообщение живет в канале пока не обработается
+	inteface, 2 метода, send(message) send(message, timeout), блокирующий пока не обработает все
+		timeout время за которое пытаемся поместить в канал сообщение
+	виды: 
+		point to point(p2p(от одного к другому)) (jms queue)
+			только 1 consumer получает сообщение, выбиратся по round robin
+		publisher subscriber(pub/sub) (jms topic)
+			направляется всем consumer которые подписались
+	классификации:
+		буферизирвоанние и нет
+		с опрашивающим консюмером или сами отдают информацию
+		асинхронные или синхронные
+
+PollableChannel
+	interface
+	имеет метод receive(получить), блокируется на нем до получения сообщения
+	опрашивает, нет ли нового сообщения
+	блокируется на ожидании сообщения
+	основана на queque java на linkedlist
+	p2p
+	можно прочитать только 1 раз сообщение, 1 сообщение 1 получатель
+
+SubscribableChannel
+	interface
+	имеет методы subscribe unsubscribe
+	реализация паттерна listener
+	pub/sub
+
+QueueChannel
+	class
+	буферизированные fifo(первым пришел первым обсужен) c p2p
+	когда достигает масимума по памяти то блокируется отправщик пока не освободиться место
+	можно задать capacity или будет ограничен размером памяти приложения
+
+PriorityChannel
+	class на основе quequeChannel
+	можно установить priority для приоритета обработки
+
+RandezvousChannel
+	class на основе quequeChannel с размером 1
+	p2p небуферизированного канала
+	блокирует получателя и отправителя пока не обработается сообщение
+
+PublishSubscribeChannel
+	реализация pub\sub канала MessageChannel.publishSubscribe()
+	по умолчанию сам вызывает подписчиков
+	можно указать минимальное кол-во подписчиков minSybscribers(), 
+		нет подписчиков не принимает сообщение
+
+DirectChannel
+	MessageChannels.direct()
+	p2p с subscribChannel
+	выбирает 1 из подписчиков по round robin, кто первый успел взять сообщение тот и обработал
+
+ExecutorChannel
+	sub chanel со своим способом обработки
+
+DataTypeChannel
+	MessageChannels.direct().datatype(type.class)
+	обычный directChannel, но разрешены только указанные типы payload
+
+NullChannel
+	канал куда сливается все что больше не нужно
+
+ErrorChannel
+	если не задан error то этот по умолчанию
+	подписчиком является логер
+
+IntegrationFlow
+	interface который является service Activator
+	является выходом из messaging части в не messaging 
+	IntegrationFlows билдер для создания service activator
+		.from указывается канал из которого взять сообщение
+		.handle("class_name", "method_name") указывается класс и метод куда 
+			будет передано сообщение
+		.channel результат после handle положить в этот канал
+		.get как build
+
+PollerMetadata
+	это инерфейс
+	используется когда нужно p2p в pub\sub
+	создается через @Bean(name = PollerMetadata.DEFAULT_POLLER)
+	Pollers это билдер для него
+		.fixedRate интервал времени в который будет опрашиватся канал
+
+
+Аннотации:
+@MessagingGetawey
+	ставится на класс, создает эндпойнт
+
+@Getawey
+	requestChannel = "name_channel"
+		указывается в какой канал отправляется информация
+		name_channel это бин канала, бин канала можно передать через spel от потока
+	для работы требуется поток который создается через @Bean, имя bean совпадает с name_channel
+		один из вариантов MessageChannel или можно работать чрез поток 
+		IntegrationFlow с его внутренними input ouptut каналами
+
+@IntegrationComponentScan
+	ставится на class с @Configuration
+	подключает spring integration и запускает всю логику
+
+
+
+
+@Conditional
+	ConditionalOnBean   Условие выполняется, в случае если присутствует нужный бин в BeanFactory.
+	ConditionalOnClass   Условие выполняется, если нужный класс есть в classpath.
+	ConditionalOnCloudPlatform   Условие выполняется, когда активна определенная платформа.
+	ConditionalOnExpression   Условие выполняется, когда SpEL выражение вернуло положительное значение.
+	ConditionalOnJava   Условие выполняется, когда приложение запущено с определенной версией JVM.
+	ConditionalOnJndi   Условие выполняется, только если через JNDI доступен определенный ресурс.
+	ConditionalOnMissingBean   Условие выполняется, в случае если нужный бин отсутствует в BeanFactory.
+	ConditionalOnMissingClass   Условие выполняется, если нужный класс отсутствует в classpath.
+	ConditionalOnNotWebApplication   Условие выполняется, если контекст приложения не является веб контекстом.
+	ConditionalOnProperty   Условие выполняется, если в файле настроек заданы нужные параметры.
+	ConditionalOnResource   Условие выполняется, если присутствует нужный ресурс в classpath.
+	ConditionalOnSingleCandidate   Условие выполняется, если bean-компонент указанного класса уже содержится в BeanFactory и он единственный.
+	ConditionalOnWebApplication   Условие выполняется, если контекст приложения является веб контекстом.
