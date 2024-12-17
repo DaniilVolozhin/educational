@@ -1,0 +1,2 @@
+CUSTOM BANNER IN RESOURCES
+${application.version}  ${application.title}

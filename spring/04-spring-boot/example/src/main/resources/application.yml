@@ -1,0 +1,13 @@
+myProperties:
+  message: msg
+  local: ru_RU
+
+application:
+  version: custom-version-banner
+  title: custom-title-banner
+
+  message: "Test Props msg@@@"
+  locale: en
+
+messager:
+  message: "Hello from Messager"

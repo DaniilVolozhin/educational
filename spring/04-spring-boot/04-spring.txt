@@ -1,0 +1,74 @@
+04
+Spring Boot:
+    фреймворк предназначенны для быстрого создания продуктового приложения
+    решает типовые задачи по работе с базами данных, очередями, логированием, вебом, мониторингом и тд
+    позволяет писать разработчикам бизнес код
+
+из чего состоит файл конфигурации:
+    родитель spring-boot-starter-parent
+        тут лежат дефолтные конфигурации
+        можно сделать своего родителя со своей конфигурацией
+        хранит в себе
+            общие настройки gradle
+            общие зависимости
+            application.properties/yml
+            преднастренные плагины
+    стартер spring-boot-starter
+        упакованные зависимости вместе с конфигурацией
+        содержат массу настроек по умолчанию и необходимые зависимости
+        притягивает кучу зависимостей
+    плагины для сборки
+        помогают собирать приложение в jar
+
+SpringApplication.run
+    создает контекст
+    обрабатывает аргументы командной строки
+    обновляет контекст
+    запускает CommandLineRunner бины
+
+
+баннер - картинка при запуске приложения. лежит в папке resource
+	${application.version} implementation-version из manifest.mf, по умолчанию project.version из maven pom
+	${application.title} implementation-title из manifest.mf, по умолчанию project.artifactId из maven pom
+	и прочее
+
+@SpringBootApplication
+	включает спринг бут
+	включает в себя аннотации
+	    @SpringBootConfiguration,
+	        	содержит @Configuration
+	    @EnableAutoConfiguration,
+	    @EnableWebMvc
+	    @ComponentScan
+
+@EnableAutoConfiguration
+	включает магию автоконфигурации спринг бута
+	(exclude = {name_class.class}) позволяет исключить автоконфигурацию классов
+
+@Conditional
+    аннотация которая определяет условие для создания бина
+	(class_name.class) в параметре указывается класс,который должен присутсвовать что бин был создан
+	ставиться на класс
+
+@ConditionalOnProperty
+	(value = "app_prop_value.key", havingValue = "value") можно указать что если значение app_prop_value.key имеет значение value то создать бин
+	позволяет задать условия для создания бина
+	ставиться на класс
+
+@ConditionalOnСlass
+	(name = "class_name") в параметре указывается класс,который должен присутсвовать что бин был создан
+	позволяет задать условия для создания бина
+	ставиться на класс
+
+@EnableConfigurationProperties
+    включает механизм заполнения java проперти из файла пропертей приложения(application.yml)
+	(file_name.yml) можно указывать имя java файла с пропертями
+	работает вместе с @ConfigurationProperties
+
+@ConfigurationProperties
+	("prefix_on_key")
+	ставить на классе, сам класс содержит поля которые являются key из application.properties или yml файла
+	ставиться вместе с @Component, класс обычно называется ApplicationSettings
+
+
+можно создать автоматическое описание метаданных проекта через spring-boot-configuration-processor, файл META-INF/spring-configuration-metadata.json

@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+group = 'ru.education.spring.boot.starter.config'
+version = '0.0.1-SNAPSHOT'
+description = 'spring-boot-config-starter'
+sourceCompatibility = '11'
+
+dependencies {
+
+    implementation 'org.springframework.boot:spring-boot-starter:2.6.3'
+    implementation 'ru.education.spring.config:config:0.0.1-SNAPSHOT'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}

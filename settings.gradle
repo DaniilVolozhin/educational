@@ -15,3 +15,7 @@ include 'spring:spring-integration'
 include 'spring:spring-async'
 include 'spring:spring-jpa-buddy'
 include 'spring:01-spring-xml', 'spring:02-spring-annotation', 'spring:03-spring-aop'
+include 'spring:04-spring-boot',
+        'spring:04-spring-boot:example',
+        'spring:04-spring-boot:spring-boot-config-starter',
+        'spring:04-spring-boot:config'
