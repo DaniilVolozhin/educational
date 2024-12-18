@@ -1,0 +1,13 @@
+condition:
+  alexey-exists: true
+  yanis-exists: false
+
+spring:
+  profiles:
+    #Доступные профили: Oleg и Peter
+    active: Oleg, Peter
+
+logging:
+  level:
+    root: ERROR
+
