@@ -8,9 +8,9 @@ import java.util.Locale;
 
 @Setter
 @Getter
-@ConfigurationProperties(prefix = "myProperties")
-public class YamlProperties {
+@ConfigurationProperties(prefix = "application")
+public class AppProps {
 
     private String message;
-    private Locale local;
+    private Locale locale;
 }
