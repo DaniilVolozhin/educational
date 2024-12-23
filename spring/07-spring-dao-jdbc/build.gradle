@@ -14,16 +14,15 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter:2.3.3.RELEASE'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc:2.3.3.RELEASE'
     implementation 'com.h2database:h2:1.4.200'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
-    testImplementation 'org.springframework.boot:spring-boot-test-autoconfigure:2.7.4'
     compileOnly 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.3.3.RELEASE'
 }
 
 group = 'ru.education'
 version = '1.0-SNAPSHOT'
 description = 'jdbc-demo-exercise'
-java.sourceCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = '11'
 
 publishing {
     publications {
@@ -35,4 +34,8 @@ publishing {
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
 }

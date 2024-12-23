@@ -1,6 +1,5 @@
 package ru.education.spring;
 
-import org.h2.tools.Console;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -18,12 +17,16 @@ public class SpringDaoJdbc {
 
         System.out.println("Persons count: " + dao.getCount());
 
-        dao.insert(new Person(2, "Ivan"));
+        dao.insert(new Person(2, "Pavel"));
 
         System.out.println("Persons count: " + dao.getCount());
 
         System.out.println("Person with id 1 : " + dao.getById(1));
         System.out.println("All person = " + dao.getAll());
-        Console.main(args);
+
+        dao.deleteById(1L);
+        System.out.println("Persons count: " + dao.getCount());
+
+//        Console.main(args);
     }
 }

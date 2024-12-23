@@ -28,7 +28,7 @@ Spring JDBC
     JdbcTemplate центральный класс для выполнения запросов
     RawMapper маппит строчку бд на объект
 
-что бы создать схему базы данных можно использовать файл schema.sql и для данных data.sql, testdata.sql лежать должны в resource
+что бы создать схему базы данных можно использовать файл schema.sql и для данных testdata.sql, testdata.sql лежать должны в resource
 
 DataSource
 	часть спецификации jdbc
@@ -47,7 +47,11 @@ JdbcTemplate
 	операции insert, update, delete выполняются через jdbc.update и возвращается число обработанных строчек
 	прочие запросы можно выполнить через execute, он является универсальным для
 	    всех операций, в основном используется для ddl
-	NamedParametsJdbcTemplate позволяет вписывать в sql параметры через :value_params, а параметры передавать в map key-column_name, value_value_params
+
+NamedParameterJdbcTemplate
+    реализация jdbcTemplate с подстановкой в запрос вместо ? по :value_params
+    использовать эту реализацию приоритетно над jdbcTemplate
+    позволяет вписывать в sql параметры через :value_params, а параметры передавать в map key-column_name, value_value_params
 
 RowMapper
 	interface с дженериком
@@ -58,19 +62,41 @@ RowMapper
 	для возрата примитивов не нужно писать маппер, для всего остального нужно
 
 Spring Boot Starter Jdbc:
-	по указанным параметрам в application.yml создат dataSource
-	загрузит data.sql, schema.sql, testdata.sql
+	сам сконфигурирует и создаст dataSource(по данным по умолчанию из application),
+	    jdbcOperations и подключит транзакционность
+	может и по указанным параметрам в application.yml создаст dataSource
+	загрузит и выполнит testdata.sql, schema.sql
+
+spring:
+    datasource:
+        url: jdbc:mysql://localhost/test
+        username: dbuser
+        password: dbpassword
+        driver-class-name: com.mysql.jdbc.Driver
+            название класса драйвера
+            если одна база используется, то можно не указывать, возьмет драйвер из зависимостей
+        initialization-mode: always
+            отвечает за выполнение schema.sql testdata.sql
+            значение по умолчанию embedded, только для встроенных баз выполнится
+            значение always всегда выполняет schema и data .sql
+        schema: schema.sql, schema2.sql
+            указывается название файлов с генерацией схемы
+            внутри файла можно использовать транзакционность
+        data: testdata.sql, data2.sql
+            указывается название файлов с заполнением схемы данными
+            внутри файла можно использовать транзакционность
 
 Spring JdbcTest:
 @JdbcTest
-	понимает чать контекста, ответсвенную за БД.
-		И выполняет schema.sql data.sql testdata.sql. откуда брать файл указывается в resources
-		в файле application.yml
-	по умолчанию создает в начале теста и отказывает в конце транзакцию
+	понимает чать контекста, ответсвенную за БД, dataSource и jdbcTemplate, но не репозитории
+		И выполняет schema.sql testdata.sql откуда брать файл указывается в файле application.yml
+		    для тестов нужно создать свой testdata.sql и указать его в application.yml
+	по умолчанию создает в начале и отказывает в конце теста транзакцию
 		можно отключить на весь класс @Transactional(propogation=NOT_SUPPORTED)
 	для работы нужен JUnit
 	включает в себя аннотацию @ExtendWith(SpringExtension.class)(не во всех старых версиях)
-	работает с аннотацией @Import(name_dao_jdbc.class), @Autowired name_dao_jdbc тестируемый класс
+	работает с аннотацией @Import(name_dao_jdbc.class) и
+	    @Autowired name_dao_jdbc тестируемый класс
 
 @DirtiesContext
 	(methodMode = DirtiessContext.MethodMode.*) обновлять контекст у метода в зависимости от *

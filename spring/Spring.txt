@@ -226,6 +226,8 @@ AOP propagation у транзакций будет работать только
 Можно управлять транзакциями через TransactionTemplate(устаревший)
 
 @Transactional
+    лучше всего ипользовать на сервисе так как он знает что нужно делать в транзакции
+        но если делаем что то атомарно, то ставить на репозиторий уместно
 	(readOnly = boolean) true - для чтения из бд, false - по умолчанию, для прочих операций
 	(propagation = Propagation.*) для работы с вложенными транзакциями
 		REQUIRED - если транзакция 1 есть, то использует ее, или создает новую
@@ -324,7 +326,7 @@ JpaRepository
 Spring Data Jpa test:
 @DataJpaTest
 	понимает часть контекста, ответсвенную за БД.
-		И выполняет schema.sql data.sql testdata.sql. откуда брать файл указывается в resources
+		И выполняет schema.sql testdata.sql testdata.sql. откуда брать файл указывается в resources
 		в файле application.yml
 	по умолчанию создает в начале теста и отказывает в конце транзакцию
 		можно отключить на весь класс @Transactional(propogation=NOT_SUPPORTED)
