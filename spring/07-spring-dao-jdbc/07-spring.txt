@@ -1,0 +1,87 @@
+07
+Работа с базами данных:
+
+DDL - data defenition language - create table
+dml - data manipilation language select, insert, delete
+dcl - data control language - deny, grant
+dtl - data transaction language - commit
+pl/sql - procedural language - if, loop, while
+
+jdbc
+    это стандарт описания драйвера, драйвера для работы с бд
+    jdbc api(использует в приложении) -> driverManager -> jdbc driver(вот это пишут разрабы бд) -> db
+    все sql запросы в базу в коде писать целиком, без конкатенации и
+        без статических элеметов
+    кидает 1 исключение SQLException, нужно открывать закрытвать коннект
+    результирующий набор обходить руками и маппить
+
+dao
+    data access object
+    соответсвует 1 бизнес сущности с которой должен работать
+	дополнительная прослойка между бизнесом и бд
+	для каждой бд своя
+	в терминах orm это репозиторий
+
+Spring JDBC
+    сам открывает и закрывает конекшн
+    сам маппит результат в объект
+    JdbcTemplate центральный класс для выполнения запросов
+    RawMapper маппит строчку бд на объект
+
+что бы создать схему базы данных можно использовать файл schema.sql и для данных data.sql, testdata.sql лежать должны в resource
+
+DataSource
+	часть спецификации jdbc
+	подзволяет абстрагироваться для коннектов и пулов
+	содержит в себе драйвер базы, url db, username и password и многое другое
+	создется как @Bean в spring jdbc
+
+JdbcTemplate
+	главный класс в spring jdbc
+	выполняет sql запросы, итерирует по результатам, ловит исключения
+	для работы необходимо dataSource, RowMapper и sql-запрос
+	тредсейф, но то что он использует
+	можно сконфигурировать 1 раз, можно на каждый dataSource
+	являеся наследником jdbcOperation
+	операция select выполняется через jdbc.queryForObject, jdbc.query
+	операции insert, update, delete выполняются через jdbc.update и возвращается число обработанных строчек
+	прочие запросы можно выполнить через execute, он является универсальным для
+	    всех операций, в основном используется для ddl
+	NamedParametsJdbcTemplate позволяет вписывать в sql параметры через :value_params, а параметры передавать в map key-column_name, value_value_params
+
+RowMapper
+	interface с дженериком
+	используется для того что бы смапить ответ из resultSet в объект java
+	    resultSet это набор строк из таблицы
+	для преобразования данных из базы в объект используется
+	    имлементация этого интерфейса
+	для возрата примитивов не нужно писать маппер, для всего остального нужно
+
+Spring Boot Starter Jdbc:
+	по указанным параметрам в application.yml создат dataSource
+	загрузит data.sql, schema.sql, testdata.sql
+
+Spring JdbcTest:
+@JdbcTest
+	понимает чать контекста, ответсвенную за БД.
+		И выполняет schema.sql data.sql testdata.sql. откуда брать файл указывается в resources
+		в файле application.yml
+	по умолчанию создает в начале теста и отказывает в конце транзакцию
+		можно отключить на весь класс @Transactional(propogation=NOT_SUPPORTED)
+	для работы нужен JUnit
+	включает в себя аннотацию @ExtendWith(SpringExtension.class)(не во всех старых версиях)
+	работает с аннотацией @Import(name_dao_jdbc.class), @Autowired name_dao_jdbc тестируемый класс
+
+@DirtiesContext
+	(methodMode = DirtiessContext.MethodMode.*) обновлять контекст у метода в зависимости от *
+		BEFORE_METHOD обновлять контекст до метода
+        	AFTER_METHOD обновлять контекст после метода
+	(classMode = DirtiessContext.ClassMode.*) обновлять контекст в зависимости от *
+		BEFORE_CLASS обновлять контекст до этого класса
+        	BEFORE_EACH_TEST_METHOD обновлять контекст до каждого метода этого класса
+        	AFTER_EACH_TEST_METHOD обновлять контекст после каждого метода этого класса
+        	AFTER_CLASS обновлять контекст после этого класса
+	(hierarchyMode = DirtiessContext.ClassMode.*)
+		гуглить
+	аннотация позволяет управлять состоянием контекста во время тестов
+
