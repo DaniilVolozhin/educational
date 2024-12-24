@@ -21,4 +21,6 @@ include 'spring:04-spring-boot',
         'spring:04-spring-boot:config',
         'spring:05-spring-boot:beans-scopes-exercise', 'spring:05-spring-boot:beans-lifecycle-exercise', 'spring:05-spring-boot:conditional-and-profiles-exercise',
         'spring:05-spring-boot:test-configuration-exercise', 'spring:05-spring-boot:spring-events-and-shell',
-        'spring:07-spring-dao-jdbc'
+        'spring:07-spring-dao-jdbc',
+        'spring:08-spring-orm-mybatis', 'spring:08-spring-orm-mybatis:orm-exercise','spring:08-spring-orm-mybatis:mybatis-demo'
+
