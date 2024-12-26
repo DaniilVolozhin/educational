@@ -12,6 +12,9 @@ import java.util.List;
 @AllArgsConstructor
 @Entity // Указывает, что данный класс является сущностью
 @Table(name = "students") // Задает имя таблицы, на которую будет отображаться сущность
+@NamedEntityGraph(
+        name = "avatar_fetch_graph",
+        attributeNodes = @NamedAttributeNode("avatar"))
 public class Student {
     @Id // Позволяет указать какое поле является идентификатором
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Стратегия генерации идентификаторов
@@ -32,6 +35,9 @@ public class Student {
     @JoinColumn(name = "student_id")
     private List<EMail> emails;
 
+//    @Fetch(FetchMode.SUBSELECT)
+//    или
+//    @BatchSize(size = 5)
     // Указывает на связь между таблицами "многие ко многим"
     @ManyToMany(targetEntity = Course.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     // Задает таблицу связей между таблицами для хранения родительской и связанной сущностью

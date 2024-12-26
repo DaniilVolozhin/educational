@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.education.spring.orm.jpql.models.Avatar;
 import ru.education.spring.orm.jpql.models.Course;
 import ru.education.spring.orm.jpql.models.EMail;
@@ -27,6 +28,10 @@ class StudentRepositoryJpaImplTest {
     private static final long FIRST_STUDENT_ID = 1L;
     private static final String FIRST_STUDENT_NAME = "student_01";
 
+    private static final int BATCH_SIZE_JOIN_FETCH_ENTITY_GRAPH_EXPECTED_QUERIES_COUNT = 3;
+    private static final int FETCH_JOIN_FETCH_ENTITY_GRAPH_EXPECTED_QUERIES_COUNT = 2;
+    private static final int JOIN_FETCH_WITH_ENTITY_GRAPH_EXPECTED_QUERIES_COUNT = 11;
+    private static final int ENTITY_GRAPH_EXPECTED_QUERIES_COUNT = 21;
     private static final int EXPECTED_QUERIES_COUNT = 31;
 
     private static final String STUDENT_AVATAR_URL = "где-то там";
@@ -51,6 +56,7 @@ class StudentRepositoryJpaImplTest {
 
     @DisplayName("должен загружать список всех студентов с полной информацией о них")
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldReturnCorrectStudentsListWithAllInfo() {
         SessionFactory sessionFactory = em.getEntityManager().getEntityManagerFactory()
                 .unwrap(SessionFactory.class);
@@ -67,6 +73,88 @@ class StudentRepositoryJpaImplTest {
         System.out.println("----------------------------------------------------------------------------------------------------------\n\n\n\n");
         assertThat(sessionFactory.getStatistics().getPrepareStatementCount()).isEqualTo(EXPECTED_QUERIES_COUNT);
     }
+
+    @DisplayName("должен загружать список всех студентов с полной информацией о них")
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void findAllWithEntityGraphShouldReturnCorrectStudentsListWithAllInfo() {
+        SessionFactory sessionFactory = em.getEntityManager().getEntityManagerFactory()
+                .unwrap(SessionFactory.class);
+        sessionFactory.getStatistics().setStatisticsEnabled(true);
+
+
+        System.out.println("\n\n\n\n----------------------------------------------------------------------------------------------------------");
+        List<Student> students = repositoryJpa.findAllWithEntityGraph();
+        assertThat(students).isNotNull().hasSize(EXPECTED_NUMBER_OF_STUDENTS)
+                .allMatch(s -> !s.getName().equals(""))
+                .allMatch(s -> s.getCourses() != null && s.getCourses().size() > 0)
+                .allMatch(s -> s.getAvatar() != null)
+                .allMatch(s -> s.getEmails() != null && s.getEmails().size() > 0);
+        System.out.println("----------------------------------------------------------------------------------------------------------\n\n\n\n");
+        assertThat(sessionFactory.getStatistics().getPrepareStatementCount()).isEqualTo(ENTITY_GRAPH_EXPECTED_QUERIES_COUNT);
+    }
+
+    @DisplayName("должен загружать список всех студентов с полной информацией о них")
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void findAllWithJoinFetchShouldReturnCorrectStudentsListWithAllInfo() {
+        SessionFactory sessionFactory = em.getEntityManager().getEntityManagerFactory()
+                .unwrap(SessionFactory.class);
+        sessionFactory.getStatistics().setStatisticsEnabled(true);
+
+
+        System.out.println("\n\n\n\n----------------------------------------------------------------------------------------------------------");
+        List<Student> students = repositoryJpa.findAllWithJoinFetchAndEntityGraph();
+        assertThat(students).isNotNull().hasSize(EXPECTED_NUMBER_OF_STUDENTS)
+                .allMatch(s -> !s.getName().equals(""))
+                .allMatch(s -> s.getCourses() != null && s.getCourses().size() > 0)
+                .allMatch(s -> s.getAvatar() != null)
+                .allMatch(s -> s.getEmails() != null && s.getEmails().size() > 0);
+        System.out.println("----------------------------------------------------------------------------------------------------------\n\n\n\n");
+        assertThat(sessionFactory.getStatistics().getPrepareStatementCount()).isEqualTo(JOIN_FETCH_WITH_ENTITY_GRAPH_EXPECTED_QUERIES_COUNT);
+    }
+
+//Fetch
+//    @DisplayName("должен загружать список всех студентов с полной информацией о них")
+//    @Test
+//    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+//    void findAllWithFetchShouldReturnCorrectStudentsListWithAllInfo() {
+//        SessionFactory sessionFactory = em.getEntityManager().getEntityManagerFactory()
+//                .unwrap(SessionFactory.class);
+//        sessionFactory.getStatistics().setStatisticsEnabled(true);
+//
+//
+//        System.out.println("\n\n\n\n----------------------------------------------------------------------------------------------------------");
+//        List<Student> students = repositoryJpa.findAllWithJoinFetchAndEntityGraph();
+//        assertThat(students).isNotNull().hasSize(EXPECTED_NUMBER_OF_STUDENTS)
+//                .allMatch(s -> !s.getName().equals(""))
+//                .allMatch(s -> s.getCourses() != null && s.getCourses().size() > 0)
+//                .allMatch(s -> s.getAvatar() != null)
+//                .allMatch(s -> s.getEmails() != null && s.getEmails().size() > 0);
+//        System.out.println("----------------------------------------------------------------------------------------------------------\n\n\n\n");
+//        assertThat(sessionFactory.getStatistics().getPrepareStatementCount()).isEqualTo(FETCH_JOIN_FETCH_ENTITY_GRAPH_EXPECTED_QUERIES_COUNT);
+//    }
+
+//BatchSize
+//    @DisplayName("должен загружать список всех студентов с полной информацией о них")
+//    @Test
+//    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+//    void findAllWithBatchSizeShouldReturnCorrectStudentsListWithAllInfo() {
+//        SessionFactory sessionFactory = em.getEntityManager().getEntityManagerFactory()
+//                .unwrap(SessionFactory.class);
+//        sessionFactory.getStatistics().setStatisticsEnabled(true);
+//
+//
+//        System.out.println("\n\n\n\n----------------------------------------------------------------------------------------------------------");
+//        List<Student> students = repositoryJpa.findAllWithJoinFetchAndEntityGraph();
+//        assertThat(students).isNotNull().hasSize(EXPECTED_NUMBER_OF_STUDENTS)
+//                .allMatch(s -> !s.getName().equals(""))
+//                .allMatch(s -> s.getCourses() != null && s.getCourses().size() > 0)
+//                .allMatch(s -> s.getAvatar() != null)
+//                .allMatch(s -> s.getEmails() != null && s.getEmails().size() > 0);
+//        System.out.println("----------------------------------------------------------------------------------------------------------\n\n\n\n");
+//        assertThat(sessionFactory.getStatistics().getPrepareStatementCount()).isEqualTo(BATCH_SIZE_JOIN_FETCH_ENTITY_GRAPH_EXPECTED_QUERIES_COUNT);
+//    }
 
     @DisplayName(" должен корректно сохранять всю информацию о студенте")
     @Test
@@ -111,6 +199,31 @@ class StudentRepositoryJpaImplTest {
         assertThat(updatedStudent.getName()).isNotEqualTo(oldName).isEqualTo(STUDENT_NAME);
     }
 
+    @DisplayName(" должен изменять имя заданного студента по его id")
+    @Test
+    void shouldUpdateStudentNameByIdWithClear() {
+        Student firstStudent = em.find(Student.class, FIRST_STUDENT_ID);
+        String oldName = firstStudent.getName();
+        em.clear();
+
+        repositoryJpa.updateNameById(FIRST_STUDENT_ID, STUDENT_NAME);
+        Student updatedStudent = em.find(Student.class, FIRST_STUDENT_ID);
+
+        assertThat(updatedStudent.getName()).isNotEqualTo(oldName).isEqualTo(STUDENT_NAME);
+    }
+
+    @DisplayName(" должен изменять имя заданного студента по его id")
+    @Test
+    void shouldUpdateStudentNameByIdWithRefresh() {
+        Student firstStudent = em.find(Student.class, FIRST_STUDENT_ID);
+        String oldName = firstStudent.getName();
+
+        repositoryJpa.updateNameById(FIRST_STUDENT_ID, STUDENT_NAME);
+        em.refresh(firstStudent);
+
+        assertThat(firstStudent.getName()).isNotEqualTo(oldName).isEqualTo(STUDENT_NAME);
+    }
+
     @DisplayName(" должен удалять заданного студента по его id")
     @Test
     void shouldDeleteStudentNameById() {
@@ -119,6 +232,18 @@ class StudentRepositoryJpaImplTest {
         em.detach(firstStudent);
 
         repositoryJpa.deleteById(FIRST_STUDENT_ID);
+        Student deletedStudent = em.find(Student.class, FIRST_STUDENT_ID);
+
+        assertThat(deletedStudent).isNull();
+    }
+
+    @DisplayName(" должен удалять заданного студента по его id")
+    @Test
+    void shouldDeleteStudentNameByIdWithRemove() {
+        Student firstStudent = em.find(Student.class, FIRST_STUDENT_ID);
+        assertThat(firstStudent).isNotNull();
+
+        em.remove(firstStudent);
         Student deletedStudent = em.find(Student.class, FIRST_STUDENT_ID);
 
         assertThat(deletedStudent).isNull();

@@ -5,9 +5,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.education.spring.orm.jpql.models.Student;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +29,22 @@ public class StudentRepositoryJpaImpl implements StudentRepositoryJpa {
         return query.getResultList();
     }
 
+    public List<Student> findAllWithEntityGraph() {
+        EntityGraph<?> entityGraph = entityManager.getEntityGraph("avatar_fetch_graph");
+        TypedQuery<Student> query =
+                entityManager.createQuery("select s from Student s", Student.class);
+        query.setHint("javax.persistence.fetchgraph", entityGraph);
+        return query.getResultList();
+    }
+
+    public List<Student> findAllWithJoinFetchAndEntityGraph() {
+        EntityGraph<?> entityGraph = entityManager.getEntityGraph("avatar_fetch_graph");
+        TypedQuery<Student> query =
+                entityManager.createQuery("select s from Student s join fetch s.emails", Student.class);
+        query.setHint("javax.persistence.fetchgraph", entityGraph);
+        return query.getResultList();
+    }
+
     @Override
     public List<Student> findByName(String name) {
         TypedQuery<Student> query = entityManager.createQuery(
@@ -51,11 +65,19 @@ public class StudentRepositoryJpaImpl implements StudentRepositoryJpa {
 
     @Override
     public void updateNameById(long id, String name) {
-
+        Query query = entityManager.createQuery(
+                        "update Student s set s.name = :name where s.id = :id");
+        query.setParameter("id", id);
+        query.setParameter("name", name);
+        query.executeUpdate();
     }
 
     @Override
     public void deleteById(long id) {
+        Query query = entityManager.createQuery(
+                "delete from Student s where s.id = :id");
+        query.setParameter("id", id);
+        query.executeUpdate();
     }
 
 }

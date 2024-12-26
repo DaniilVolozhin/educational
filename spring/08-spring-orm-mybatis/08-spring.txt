@@ -213,9 +213,6 @@ JPQL:
 	для добавления параметров setParameters которые в query :param
 	для опреаций не на чтение делать executeUpdate()
 
-test jpa:
-можно мокать entitymanager, entitytransaction, query
-
 Итог
     весь sql в маппинге entity
     entity бизнес слой
