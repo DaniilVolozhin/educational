@@ -1,0 +1,110 @@
+Spring Boot Data:
+    решает проблему дублирования однообразного кода, настроек, гибкости,
+        скорости разработки
+    предоставляет абсрактное апи для вызова базы данных
+    spring-boot-starter-data-jpa, spring-boot-data-jpa и множество других модулей
+        к разным базам, официальные и полу официальные
+    интерфейс через который работает магия Repository
+
+CrudRepository
+    <Class, PrimaryKeyJavaClass>
+    интерфейс, наследник Repository
+    содержит универсальные методы для работы с бд
+
+
+PagingAndSortingRepository
+    <Class, PrimaryKeyJavaClass>
+	наследник CrudRepository
+	2 метода findAll с сортировкой и пагинацей
+	pagingAndSorting
+    	Sort.by(ASC или DESC, "column_sort1", "column_sort2" ...)
+    		передается в параметры методов и возвращает отсортированные массив
+    	пагинация PageRequest.of(page, count)
+    		page номер страницы, начинается отсчет с 0, то есть 2 - это 3я страница
+    		count это количетсво которое должно быть выведено на странице
+
+Repository
+    интерфейс без методов, у его наследников будет работать магия spring data
+    наследники интерфейса могут описывать методы для работы с бд в методах java
+        используя ключевые слова, который будут транслироваться в jpql
+	все реализации интерфейса Repository нужно пометить @Repository
+	в сущности должен быть конструктор без параметров
+	у баз данных есть свои реализации Repository со своими фишками
+	возможные ключевые слова:
+        And
+        Or
+        By
+        Between
+        LessThen
+        LessThenEqual
+        GreaterThan
+        After
+        Before
+        IsNull
+        IsNotNull, NotNull
+        Like, NotLike
+        Containing
+        OrderBy
+        Not
+        In
+        NotIn
+        IgnoreCase
+
+MongoRepository
+    <Class, PrimaryKeyJavaClass>
+    используется для Mongo
+
+JpaRepository
+    создан для нужд jpa
+	расширение PagingAndSortingRepository
+
+@Query
+	("jpql query or sql(isNative=true)")
+	позволяет написать запрос в jpql или sql который будет выполнен вместо запроса
+	    из сигнатуры метода
+    параметры можно передать
+        с использованием entity.field = ?1, где 1 это первый параметр в методе
+        с @Param("name_param_из_query") в параметрах метода, а в запросе :name_param
+            рекомендованный вариант
+	ставиться на метод
+
+@Param
+	("name_param_из_query")
+	ставиться на параметры в методе
+
+CustomRepository
+    можно написать свою реализацию репозитория со своими методами:
+	создается интерфейс EntityNameRepository который наследуется
+	    от Repository(и наследников) и EntityNameRepositoryCustom,
+	    делается интерфейс EntityNameRepositoryCustom с кастомными методами,
+	    у него делается наследник EntityNameRepositoryCustomImpl,
+		в EntityNameRepositoryCustomImpl реализуются методы
+		(в impl можно добавить @Authowired EntityNameRepository как поле,
+		    циклическая зависимость)
+
+
+Spring Data Jpa test:
+@DataJpaTest
+	понимает часть контекста, ответсвенную за БД.
+		И выполняет schema.sql testdata.sql testdata.sql. откуда брать файл указывается в resources
+		в файле application.yml
+	по умолчанию создает в начале теста и отказывает в конце транзакцию
+		можно отключить на весь класс @Transactional(propogation=NOT_SUPPORTED)
+	для работы нужен JUnit
+	включает в себя аннотацию @ExtendWith(SpringExtension.class)(не во всех старых версиях)
+	в тест @Autowired Repo и можно TestEntityManager
+
+@AutoConfigureTestDatabase
+	(replace = Replace.*)
+	    отвечает за то как будет конфигурироваться база данных для тестов
+		ANY может заменить любую автоматически сконфигурированную
+			или определенную вручную базу данных на тестовую
+		AUTO_CONFIGURED может заменить только автоматически сконфигурированную на тестовую
+		NONE не может заменить базу данных на тестовую
+	(connection = EmbeddedDatabaseConnection.*) указать к какой встроенной базе коннектиться
+		HSQL, DERBY, H2, NONE
+
+Какие тесты писать:
+1. read, write(уйдут поблемы с маппингом)
+2. сложные вопрос
+3. собственные реализации методов
