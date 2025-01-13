@@ -1,0 +1,11 @@
+spring:
+  data:
+    mongodb:
+      database: company
+
+mongock:
+  runner-type: "ApplicationRunner" # default
+  #runner-type: "InitializingBean"
+#                 если использовать вместе с spring shell
+  change-logs-scan-package:
+    - ru.education.spring.changelog

@@ -1,0 +1,185 @@
+Spring Data Key-Value:
+    дефолтная релизация на ConcurrentHashMap
+    spring-data-key-value
+
+@EnableMapRepositories
+	(mapType = название_реализация.class)
+	    можно указать на какую реализация заменить дефолтную map
+	включает работы с key-value db
+
+@KeySpace
+	("name_entity")
+	ставить на сущность
+	аналог @Entity для табличной бд
+
+@Id
+	указывает какое поле класса будет key, value - entity
+	ставить на поле класса с @KeySpace
+
+@Repository
+    аннотацией помечают слой репозитория
+	работает так же как и для релиционной базы
+
+Repository
+	для keyValue так же можно наследовать от
+	    CrudRepository
+	    PagingAndSorting
+	    KeyValueRepository(как для jpa есть свой репозиторий)
+
+
+KeyValueTemplate
+    позволяет писать свои кастомные методы для keyValueRepository
+	содержит методы для работы с базой(подобно entityManager в jpa)
+	можно создать KeyValueQuery и работать через него
+	рекомендуется работать через KeyValueOperation
+	автоматически создается, но можно переопределить вручную
+	создается через
+	    KeyValueOperations()
+	        new KeyValueTemplate(keyValueAdapter())
+		 KeyValueAdapter()
+		    MapKeyValueAdapter(название_класса_реализации_маппы.class)
+
+
+Mongo:
+    масштабируемая
+    высокопроизводительная
+    интерфейс на js
+    простая в использовании
+    эффективно работает с большими данными
+    хранит документы
+    никаких json-ов
+
+реляционная база данных и монга
+database            database
+table               collection
+raw                 document
+column              field
+join                embedding & linking
+foreign key         reference
+
+database
+    база данных
+    состоит из коллекций
+    сама создается если к ней обращаются
+
+collection
+    коллекции
+    состоит из документов
+
+document
+    документ
+    хранится в формате bson
+    есть id(аналог primary key)
+    id может создаваться сам или быть передан, монга будет следить что
+        бы не было дупликатов сама
+    поддерживает отношения с другими документами по ссылке или embedded
+
+Связи в монге
+    1 к 1
+        embedding
+            можно встроить документ в другой документ
+        linking
+            можно расположить документ в отдельной таблице и сделать ссылку
+    1 к М
+        embedding
+            можно встроить массив документов в другой документ
+        linking
+            можно встроить массив двух ссылок на два других документа
+        рекоментованно embedding, когда это возможно. Данные к которым осуществляется
+            совместный доступ к единому объекту лучше и хранить вместе
+        иногда имеет смысл комбинировать способы хранения(10 последни отзывов в продукте
+            остальное в коллекции отзывов)
+    М к М
+        embedding
+            если много чтения, а не записи
+            повторение данных не проблема
+            изменение происходят на одной из строн
+        ссылаться
+            если много связаных сущностей
+            изменения часто в обеих сущностях
+        смешанных подход для лучшей производительности
+
+Spring Data Mongo:
+    можно создать бины руками
+    можно использовать spring-boot-starter-mongodb
+        настройки application.yml
+        spring:
+        	data:
+        		mongodb:
+        			authentication-database: admin
+        			username: root
+        			password: root
+        			database: user_db
+        			port: 27017
+        			host: localhost
+
+@EnableMongoRepositories
+	настраевает бины для работы с монгой
+	c embedded не нужно ставить
+	ставится на @Configuration
+
+@Document
+	используется для обозначения сущностей при работе с mongo
+	аналог @Entity
+
+@Id
+	указать уникальный ключ
+
+@Field
+	поле, аналоог @Column
+
+@DbRef
+	ссылка для объекта, аналог связей
+
+@Transient
+	если не хотим сохранять поле
+
+@Query
+	работает с синтаксисом монги так же как и в data-jpa
+
+@Param
+    используется для сопоставления параметров запроса и подстановки их в @Query
+    работает как в data-jpa
+
+MongoRepository
+    класс содержит методы для работы с базой
+    есть уникальное слова для формирования имени методов для общения с базой
+
+
+MongoTemplate
+	содержит огромное количество методов которых нет в repository
+	позволяет писать запросы через Query(объект)
+	в spring boot автоматически, но можно и сконфигурирвать руками
+		создается через Mongo(new MongoClient()), а new MongoTemplate(mongo())
+
+Каскадные операции в монго:
+	нужно отнаследоваться от AbstractMongoEventListener и
+	    реализовать метод onBeforeConvert и заложить логику, по классу
+
+Есть embeded-mongo
+	de.flapdoodle.embed.mongo
+	можно использовать для тестов
+
+Mongock:
+	flyway\liquibase для mongo только описывается в java
+	com.github.cloudyrock.mongock.mongock-spring-v5 и драйвер
+	    com.github.cloudyrock.mongock.mongodb-springdata-v3-driver
+
+@EnableMongock
+	включает работу с mongock в spring boot приложении
+
+@ChangeLog
+	ставить на классе который будет содержать changeset
+
+@ChangeSet
+	(order = "***") *** это номер выполнения, например 001, 002
+	(id = "название_операции") указвается название выполяемой операции
+	(author = "кто написал метод")
+	(runAlways = boolean) true, запускаться всегда
+	ставить на методы класса
+	в параметры метода можно передать параметры, MongoDatabase, entity_nameRepository
+
+mongock:
+	change-logs-scan-package:
+	- package.mongock.changelog
+	    где искать changelog(классы java со скриптами)
