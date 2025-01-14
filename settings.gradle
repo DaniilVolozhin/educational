@@ -26,5 +26,6 @@ include 'spring:04-spring-boot',
         'spring:08-spring-orm-mybatis', 'spring:08-spring-orm-mybatis:orm-exercise','spring:08-spring-orm-mybatis:mybatis-demo',
         'spring:09-spring-orm-jpql',
         'spring:11-spring-data',
-        'spring:13-spring-data-nosql', 'spring:13-spring-data-nosql:spring-data-keyvalue', 'spring:13-spring-data-nosql:spring-data-mongo'
+        'spring:13-spring-data-nosql', 'spring:13-spring-data-nosql:spring-data-keyvalue', 'spring:13-spring-data-nosql:spring-data-mongo',
+        'spring:15-spring-mvc'
 
