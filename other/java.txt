@@ -1,0 +1,110 @@
+Функциональные интерфейсы:
+	Функциональным считается интерфейс с одним не реализованным (абстрактным) методом
+	Допустимы статические методы
+
+Predicate<T> проверяет соблюдение некоторого условия, если соблюдается - true
+
+Consumer<T> принимает Т, не возвращает, выполнить действие над Т
+
+Function<T,R> принимает T, возвращает R, от (А к Б)
+
+Supplier<T> не принмиает, возвращает Т
+
+UnaryOperator<T> принимает Т, возвращает Т, унарная(А1 в А2)
+
+BinaryOperator<T> принимает два T, возвращает Т, выполняет бинарную(А1,А2 в А3) операцию
+
+
+
+H2:
+application.yml
+	можно укзать вместо Console.args(args) параметр для запуска в web, и для этого добавить в
+		зависимоти проект webh2
+
+
+@JsonFormat(pattern=YYYY-MM-DD ТHHMMSS±HHMM  +nM  +nm )
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+
+new ObjectMapper()        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+
+
+assertEquals(foo, Foo.method());
+ try (MockedStatic mocked = mockStatic(Foo.class)) {
+ mocked.when(Foomethod).thenReturn(bar);
+ assertEquals(bar, Foo.method());
+ mocked.verify(Foomethod);
+ }
+ assertEquals(foo, Foo.method());
+
+
+@WebFluxTest We can use the @WebFluxTest annotation to test Spring WebFlux controllers. It's often used along with @MockBean to provide mock implementations for required dependencies.
+
+    @JdbcTest We can use the @JdbcTest annotation to test JPA applications, but it's for tests that only require a DataSource. The annotation configures an in-memory embedded database and a JdbcTemplate.
+
+    @JooqTest To test jOOQ-related tests, we can use @JooqTest annotation, which configures a DSLContext.
+
+    @DataMongoTest To test MongoDB applications, @DataMongoTest is a useful annotation. By default, it configures an in-memory embedded MongoDB if the driver is available through dependencies, configures a MongoTemplate, scans for @Document classes, and configures Spring Data MongoDB repositories.
+
+    @DataRedisTestmakes it easier to test Redis applications. It scans for @RedisHash classes and configures Spring Data Redis repositories by default.
+    @DataLdapTest configures an in-memory embedded LDAP (if available), configures a LdapTemplate, scans for @Entry classes, and configures Spring Data LDAP repositories by default.
+
+    @RestClientTest We generally use the @RestClientTest annotation to test REST clients. It auto-configures different dependencies such as Jackson, GSON, and Jsonb support; configures a RestTemplateBuilder; and adds support for MockRestServiceServer by default.
+    @JsonTest Initializes the Spring application context only with those beans needed to test JSON serialization.
+
+
+LocalDate –  дата без времени и временных зон;
+    LocalTime – время без даты и временных зон;
+    LocalDateTime – дата и время без временных зон;
+    ZonedDateTime – дата и время с временной зоной;
+    DateTimeFormatter – форматирует даты в строки и наоборот, только для классов java.time;
+    Instant – колличество секунд с Unix epoch time (полночь 1 января 1970 UTC);
+    Duration – продолжительность в секундах и наносекундах;
+    Period – период времени в годах, месяцах и днях;
+    TemporalAdjuster – корректировщик дат (к примеру, может получить дату следующего понедельника);
+
+//todo: разделить это по файлам
+@NotNull validates that the annotated property value is not null.
+@AssertTrue validates that the annotated property value is true.
+@Size validates that the annotated property value has a size between the attributes min and max; can be applied to String, Collection, Map, and array properties.
+@Min validates that the annotated property has a value no smaller than the value attribute.
+@Max validates that the annotated property has a value no larger than the value attribute.
+@Email validates that the annotated property is a valid email address.
+
+@NotEmpty validates that the property is not null or empty; can be applied to String, Collection, Map or Array values.
+@NotBlank can be applied only to text values and validates that the property is not null or whitespace.
+@Positive and @PositiveOrZero apply to numeric values and validate that they are strictly positive, or positive including 0.
+@Negative and @NegativeOrZero apply to numeric values and validate that they are strictly negative, or negative including 0.
+@Past and @PastOrPresent validate that a date value is in the past or the past including the present; can be applied to date types including those added in Java 8.
+@Future and @FutureOrPresent validate that a date value is in the future, or in the future including the present.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
