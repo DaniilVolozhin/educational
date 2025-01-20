@@ -21,5 +21,6 @@ include 'spring:04-spring-boot', 'spring:04-spring-boot:example', 'spring:04-spr
         'spring:13-spring-data-nosql', 'spring:13-spring-data-nosql:spring-data-keyvalue', 'spring:13-spring-data-nosql:spring-data-mongo',
         'spring:15-spring-mvc',
         'spring:16-spring-mvc-view',
-        'spring:18-spring-java-rx'
+        'spring:18-spring-java-rx',
+        'spring:19-spring-react:spring-web-flux', 'spring:19-spring-react:spring-reactor', 'spring:19-spring-react:spring-reactive-spring-data'
 

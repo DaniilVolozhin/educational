@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2/')
+    }
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-webflux:2.2.6.RELEASE'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.19'
+}
+
+group = 'ru.educatioin'
+version = '1.0'
+description = '19-spring-web-flux'
+sourceCompatibility = '11'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}

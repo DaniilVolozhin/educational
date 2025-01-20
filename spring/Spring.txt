@@ -16,42 +16,6 @@ Spring-boot-actuator:
 
 
 
-Reactive Spring Stack:
-Netty(Tomcat с донастройкой + servlet api 3.1), Project Reactor, Spring Data Reactive Repositories,
-Spring WebFlux, Spring Reactive Security
-
-Spring WebFlux:
-	аналог spring mvc, но реактивный
-
-Single
-	для возврата единичного значения в реактивном формате
-Flowable
-	для возврата множества в реактивном формате
-
-Project Reactor аналог RxJava(Spring поддержа из коробки):
-	mono - реактивный optional(single + packpressure усточивость)
-	flux - множества в реактивном формате(с поддержкой packpressure)
-
-produces = MediaType.TEXT_EVENT_STREAM_VALUE
-	если использовать этот тип то будет открыт что то вроде веб сокет
-	он значить что не надо закрывать соединения, данные будут досылаться
-
-	
-Reactive-repository-mongo:
-@EnableReactiveMongoRepository
-	реакливность для монго
-
-для создания репозиториев
-	extends ReactiveMongoRepository<?,?>
-
-
-Transaction
-	работает через @Transaction так же как и в не реактивном
-	или через template.inTransaction().execute()
-
-
-
-
 Spring Web Flux:
 
 как работает
