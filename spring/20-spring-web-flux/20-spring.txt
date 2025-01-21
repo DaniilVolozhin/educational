@@ -1,0 +1,76 @@
+Spring Web Flux:
+    ленивое выполнение, нужно что бы был подписчик
+    сам web flux выступает подписчиком результата controller class
+    как работает
+        приходит запрос, попадает в очередь, когда будет обработан, создается register
+        callback в очередь для дальнейшней обработки, после выполнения логики, будет
+        зарегистрирован trigger callback(ответ клиенту)
+
+@EnableWebFlux
+	настраевает бины для реактивного программирования
+
+Reactive-streams
+	Mono<Person>
+	    поток из 0..1 пёрсонов
+	Flux<Person>
+	    поток из 0..n пёрсонов
+RxJava v1
+	Single<Person>
+	    поток из 0..1 пёрсонов
+	Observable<Person>
+	    поток из 0..n пёрсонов
+RxJava v2
+	Single<Person>
+	    поток из 0..1 пёрсонов
+	Flowable<Person>
+	    поток из 0..n пёрсонов
+
+Flux<ServerSentEvent>
+	web socket тип
+
+ResponseEntity
+    рекомендован к использования в Annotation controller
+
+side effects
+    функции лучше всего писатьтакие функции
+    математическая функций
+    отображения одного множества в другое
+    никаких изменений аргументов не предполагается, запросов и т.д.
+
+Mono<Void>
+    позволяет выполнить работу и вернуть ответ без тела
+
+Functional Endpoints(route)
+	создается через @Bean
+	возвращаемое значение RouterFunction<ServerResponse>
+    ответ собирается из route()
+    путь задается через METHOD_TYPE.("url_name")
+    callback -> обработка запроса
+    теперь вся логика функции
+        route
+            основная функция
+        handlers
+            мелкие функции
+    при написании учитывается порядок
+
+Reactive Test:
+    reactor-test
+        библиотека для тестов
+
+StepVerifier  класс для проверки реактивных объектов
+    StepVerifier.create(reactive_object)
+        создаст реактивную обертку над объектом
+    .assertNext()
+        возмет первый элемент и с ним можно сделать проверку
+    .expectNextCount()
+        ожидает кол-во элементом переданные в параметры
+    .expectComplete()
+        проверяет что выполнилось успешно
+    .verify()
+        подпишется на результат переданного значения
+
+Controller-test:
+    WebTestClient
+        работает по аналогии с WebMvc
+
+

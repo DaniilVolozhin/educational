@@ -1,0 +1,33 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2/')
+    }
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-webflux:2.2.4.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive:2.2.4.RELEASE'
+    implementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.2.0'
+    testImplementation 'io.projectreactor:reactor-test:3.3.2.RELEASE'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.2.4.RELEASE'
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+}
+
+group = 'ru.education'
+version = '1.0'
+description = '20-spring-web-flux'
+sourceCompatibility = '11'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+test {
+    useJUnitPlatform()
+}

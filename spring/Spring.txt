@@ -16,51 +16,6 @@ Spring-boot-actuator:
 
 
 
-Spring Web Flux:
-
-как работает
-	приодит запрос, выполняется метод, из него возвращается поток, Spring WebFlux подписывается
-		на этот поток и поток начинает выполняться, когда поток выполниться 
-		тогда сформируется ответ клиенту и будет отправлен
-
-
-@EnableWebFlux
-	настраевает бины для реаклтивного программирования
-
-Reactive-streams
-	Mono<Person> - поток из 0..1 пёрсонов
-	Flux<Person> - поток из 0..n пёрсонов
-RxJava v1
-	Single<Person> - поток из 0..1 пёрсонов
-	Observable<Person> - поток из 0..n пёрсонов
-RxJava v2
-	Single<Person> - поток из 0..1 пёрсонов
-	Flowable<Person> - поток из 0..n пёрсонов
-
-Flux<ServerSentEvent>
-	web socket тип
-
-
-Functional Endpoints(route)
-	создается через @Bean, возвращаемое значение RouterFunction<ServerResponse>
-		создание объекта route().*(GET("url_name", accept(), request -> обработка запроса,
-		и тд), POST и тд)
-
-
-Reactive Test:
-reactor-test
-	библиотека для тестов
-
-Repository:
-StepVerifier  класс для проверки реактивных объектов
-	StepVerifier.create(reactive_object).assert...
-
-Controller-test:
-WebTestClient
-	по аналогии с WebMvc
-
-
-
 
 Spring Security:
 в web работает через servlet filter, фильтры объединены в цепочки
