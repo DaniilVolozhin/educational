@@ -17,94 +17,6 @@ Spring-boot-actuator:
 
 
 
-Spring Security:
-в web работает через servlet filter, фильтры объединены в цепочки
-цели:
-аутентификация
-	что пользователь тот за кого себя выдает(кто ты?)
-авторизация
-	предоставление прав доступа к объекту(что ты можешь?)
-
-spring security может
-	подтверждение подлинности
-	предоставление/запрещение доступа
-	храненить права доступа
-	проверять права доступа
-
-Механизмы аутентификации в spring security
-	http basic, http digest, http x.509, form-based, openId, LDAP, jdbc или in memory,
-		active directory, своя реализация
-
-Механизмы авторизации
-	по url
-	по методам сервисов
-	по объектам
-
-не может 
-	защитить от sql injection, xss и прочего
-	не шифрует и не обфусцирует поток
-
-Основные компоненты:
-
-SecurityContext
-	хранилище для Authentication
-
-SecurityContextHolder
-	позволяет получить SecurityContext для текущей сессии
-	можно настроить формат работы через MODE_*
-		THREADLOCAL(по потоку), INHERITABLETHEADLOCAL(дерево), GLOBAL(во всем приложении)
-
-Authentication
-	хранит данные о аутентификации и авторизации и текущем пользователе
-	Authorities
-		это права которые зарегистрированы
-		GrantedAuthority
-			список текущих запрещений или разрешений
-	Credentials
-		секрет которым пользователь подствержает что это он(пароль)
-	Details
-		общая информация о пользователе
-	Principal
-		идентификатор пользователя(логин)
-
-UserDetails
-	содержит данные пользователя из хранилища приложения, и его состояние
-	authorities, username, password, accountNonExpired(истек ли срок действия),
-	accountNonLocked(заблокирован ли), credentialsNonExpired(протух ли пароль), enabled(включен ли)
-
-UserDetailsSerive
-	загружает userDetailsService
-	необходимо явно создать как бин, и возвращать выбранную реализацию
-
-
-Фильтры в Spring Security по порядку вызова:
-
-ChannelProcessingFilter
-	управляет каналом передачи запроса. Если хочется только https, то не https развернет он
-		редирект или что то еще
-
-ConcurrentSessionFilter
-	работа с сессиями пользователя
-
-SecurityContextPersistenceFilter
-	создает и сохраняет контекст безопасности
-
-Фильтр(ы) аутетификации
-	первичная аутентификация
-
-RememberMeAuthenticationFilter
-	вторичная аутентификация
-
-AnonymousAthenticationFilter
-	вторичная аутентификация
-
-ExceptionTranslationFilter
-	обработка данных с предыдущих шагов, принятие решения переходить ли к авторизации
-
-FilterSecurityInterceptor
-	работа с авторизацией
-
-
 путь HttpRequest со Spring Security:
 реализации будут зависеть от выбраного типа аутентификации
 -> вызывает
@@ -128,7 +40,7 @@ PasswordEncoder
 AbstractSecurityInterceptor
 	занимает авторизацией
 
-AcessDesicionManager
+AccessDesicionManager
 	примает решение о доступе к функционалу приложения, обработка доступов у авторизации
 
 FilterSecurityInterceptor
