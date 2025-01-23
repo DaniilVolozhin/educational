@@ -14,61 +14,6 @@ Spring-boot-actuator:
 2. повышение надежности, в случае ошибки упадет только часть системы
 3. Легче тестировать
 
-
-
-
-путь HttpRequest со Spring Security:
-реализации будут зависеть от выбраного типа аутентификации
--> вызывает
-httpRequest ->
-BasicAuthenticationFilter ->
-AuthenticationManager(выполняет аутентификацию, создает фейк реализацию Authentication)-> 
-ProviderManager ->
-AuthenticationProvider(конкретная реализация аутенификации) ->
-UserDetailsService(получает UserDetails) -> 
-AuthenticationProvider(проверяет пароль на совпадение(через сравнение закодированных),
-	задает реальный Authentication) ->
-BasicAuthenticationFilter(если authenticated false, то ошибка)(если true то пишем в) -> 
-SecurityContextHolder
-
-
-PasswordEncoder
-	функция кодирования пароля
-	создается как бин
-	к функциям хеширования небходимо добавлять солья
-
-AbstractSecurityInterceptor
-	занимает авторизацией
-
-AccessDesicionManager
-	примает решение о доступе к функционалу приложения, обработка доступов у авторизации
-
-FilterSecurityInterceptor
-	Управляет доступом на уровне URL
-	Использует цепочку HTTP фильтров для управления доступом
-
-MethodSecurityInterceptor
-	Управляет доступом на уровне методов класса
-	Использует Spring AOP
-
-
-@EnableWebSecurity
-	включает создание и конфигурацию бинов
-
-
-spring security web:
-работает через servlet filter
-
-DelegatingFilterProxy
-	передает вызов в цепочку фильтров security
-
-WebSecurityConfigurerAdapter
-	настраевает цепочку фильтров
-	порядок фильтров в цепочке можно сконфигурировать(очень осторожно)
-	configure(WebSecurity) какие пути мы игнорируем для security
-	configure(HttpSecurity) настраевает фильтры для security
-
-
 Работа в конфигурационном классе:
 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.*)
 	указывается какое состояние должно быть у SecurityContext,
@@ -77,7 +22,6 @@ WebSecurityConfigurerAdapter
 	NEVER не создает httpSession, но использует если она есть
 	IF_REQUIRED создаст httpSession если это необходимо
 	STATELESS никогда не создаст httpSession и не будет ее использовать
-
 
 Form-based:
 нужно использовать только в https
